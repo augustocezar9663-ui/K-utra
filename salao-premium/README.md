@@ -115,7 +115,11 @@ salao-premium/
 
 ### Fotografias
 
-O projeto **não inclui fotos de banco de imagens apresentadas como se fossem do salão**. Enquanto as fotos reais não são enviadas pelo painel, o site exibe composições gráficas abstratas na paleta da marca. Para o resultado final, envie em *Configurações* (hero, ambiente, logo), *Serviços*, *Profissionais* e *Galeria* fotografias profissionais com pelo menos 1600 px no maior lado (JPG/WEBP, até 8 MB).
+O projeto **não inclui fotos de banco de imagens apresentadas como se fossem do salão**. As 4 fotos de cortes enviadas pelo salão ficam em `public/galeria/` e são cadastradas pelo `seed.sql` na *Galeria* (degradê, cacheado e mullet); a do mullet também ilustra o serviço *Corte Masculino* e a do degradê na nuca, o *Acabamento*. Onde ainda não há foto, o site exibe composições gráficas abstratas na paleta da marca.
+
+- Para trocar, ocultar ou remover uma foto: `/admin/galeria` (ou *Serviços*). Rodar o seed de novo não recria fotos removidas.
+- Novas fotos podem ser enviadas pelo painel (vão para o Storage do Supabase). Fotos feitas no celular, na vertical, funcionam bem: a galeria foi desenhada para retratos.
+- Publique apenas fotos de clientes que autorizaram o uso da imagem — no caso de menores de idade, com autorização do responsável (LGPD).
 
 ### Rate limit
 

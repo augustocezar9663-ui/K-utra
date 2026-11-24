@@ -8,15 +8,9 @@ import { useLenis } from "@/components/motion/smooth-scroll";
 import { Reveal, RevealLines } from "@/components/ui/reveal";
 import type { GalleryImage } from "@/lib/types";
 
-// Padrão editorial assimétrico (repete a cada 6 imagens)
-const SPANS = [
-  "md:col-span-7 md:row-span-2 aspect-[4/5] md:aspect-auto",
-  "md:col-span-5 aspect-[4/3]",
-  "md:col-span-5 aspect-[4/3]",
-  "md:col-span-4 aspect-[3/4]",
-  "md:col-span-4 aspect-[3/4] md:translate-y-12",
-  "md:col-span-4 aspect-[3/4]",
-];
+// Grade editorial para fotos verticais (celular): colunas alternadas
+// deslocadas para baixo criam ritmo sem cortar os retratos.
+const OFFSET = ["", "translate-y-8 md:translate-y-16", "md:translate-y-6", "translate-y-8 md:translate-y-24"];
 
 export function GallerySection({ images, instagramUrl }: { images: GalleryImage[]; instagramUrl: string | null }) {
   const categories = useMemo(
@@ -73,7 +67,7 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
                     role="tab"
                     aria-selected={filter === c}
                     onClick={() => setFilter(c)}
-                    className={`min-h-10 border px-4 text-[0.66rem] font-semibold uppercase tracking-[0.2em] transition-colors duration-200 ${
+                    className={`min-h-10 border px-4 text-sm font-medium transition-colors duration-200 ${
                       filter === c ? "border-ink bg-ink text-white" : "border-line text-stone hover:border-ink hover:text-ink"
                     }`}
                   >
@@ -97,7 +91,7 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
             ) : null}
           </div>
         ) : (
-          <motion.ul layout className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-20 md:grid-cols-12 md:gap-6">
+          <motion.ul layout className="mt-16 grid grid-cols-2 gap-3 pb-8 sm:gap-4 md:mt-20 md:grid-cols-4 md:gap-5 md:pb-24">
             <AnimatePresence mode="popLayout">
               {visible.map((img, i) => (
                 <motion.li
@@ -107,27 +101,29 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
                   whileInView={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.98 }}
                   viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-                  transition={{ duration: 0.9, delay: (i % 3) * 0.06 }}
-                  className={`relative ${SPANS[i % SPANS.length]}`}
+                  transition={{ duration: 0.75, delay: (i % 4) * 0.06 }}
+                  className={`relative aspect-[3/5] ${OFFSET[i % OFFSET.length]}`}
                 >
                   <button
                     type="button"
                     onClick={() => setActive(i)}
                     className="group relative block h-full w-full overflow-hidden bg-sand"
-                    aria-label={`Ampliar imagem${img.alt ? `: ${img.alt}` : ""}`}
+                    aria-label={`Ampliar foto${img.alt ? `: ${img.alt}` : ""}`}
                   >
                     <Image
                       src={img.image_url}
                       alt={img.alt}
                       fill
-                      sizes="(min-width: 768px) 50vw, 100vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      sizes="(min-width: 768px) 24vw, 48vw"
+                      quality={80}
+                      className="object-cover object-[50%_40%] transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                     />
-                    <span className="absolute inset-0 bg-ink/0 transition-colors duration-300 ease-out group-hover:bg-ink/15" />
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/60 to-transparent transition-opacity duration-300 ease-out group-hover:opacity-90"
+                    />
                     {img.category ? (
-                      <span className="label absolute bottom-4 left-4 translate-y-2 text-white opacity-0 transition-[opacity,transform] duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-                        {img.category}
-                      </span>
+                      <span className="label absolute bottom-3 left-3 text-white sm:bottom-4 sm:left-4">{img.category}</span>
                     ) : null}
                   </button>
                 </motion.li>
@@ -151,10 +147,10 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
           >
             <motion.div
               key={visible[active].id}
-              className="relative h-[82vh] w-full max-w-5xl"
+              className="relative h-[78vh] w-full max-w-5xl"
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
               <Image
@@ -195,8 +191,11 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
                 >
                   <ChevronRight strokeWidth={1.25} />
                 </button>
-                <p className="label absolute bottom-6 left-1/2 tabular-nums -translate-x-1/2 text-white/60">
-                  {active + 1} / {visible.length}
+                <p className="label absolute bottom-6 left-1/2 w-[min(90vw,40rem)] -translate-x-1/2 text-center text-white/80">
+                  {visible[active].alt ? <span className="block text-white">{visible[active].alt}</span> : null}
+                  <span className="tabular-nums text-white/60">
+                    {active + 1} / {visible.length}
+                  </span>
                 </p>
               </>
             ) : null}

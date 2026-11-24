@@ -50,3 +50,22 @@ update public.services
    ('penteados', 'Penteados'), ('coloracao', 'Coloração'),
    ('reconstrucao-capilar', 'Reconstrução Capilar'), ('tratamento-especializado', 'Tratamento Especializado')
  );
+
+-- Galeria: fotos de cortes enviadas pelo salão (arquivos em public/galeria).
+-- Idempotente: cada foto só é inserida se ainda não estiver cadastrada, então
+-- rodar o seed de novo não duplica nem reativa fotos removidas no painel.
+insert into public.gallery_images (image_url, alt, category, sort_order)
+select v.image_url, v.alt, v.category, v.sort_order
+  from (values
+    ('/galeria/degrade-baixo-nuca.jpg',        'Degradê baixo na lateral e na nuca, com o topo mais longo penteado para a frente', 'Degradê',  1),
+    ('/galeria/degrade-medio-texturizado.jpg', 'Degradê médio na lateral com o topo texturizado',                                   'Degradê',  2),
+    ('/galeria/cacheado-com-degrade.jpg',      'Cachos preservados no topo com degradê baixo nas laterais',                         'Cacheado', 3),
+    ('/galeria/mullet-burst-fade.jpg',         'Mullet moderno com burst fade ao redor da orelha',                                  'Mullet',   4)
+  ) as v(image_url, alt, category, sort_order)
+ where not exists (select 1 from public.gallery_images g where g.image_url = v.image_url);
+
+-- Fotos dos serviços: só preenche quando o serviço ainda não tem imagem.
+update public.services set image_url = '/galeria/mullet-burst-fade.jpg'
+ where slug = 'corte-masculino' and image_url is null;
+update public.services set image_url = '/galeria/degrade-baixo-nuca.jpg'
+ where slug = 'acabamento' and image_url is null;

@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { imageUrl } from "@/lib/validation";
 import { type ActionState, dbError, done, fail, zodFieldErrors } from "@/lib/action-result";
 import { assertAdmin } from "@/lib/auth";
 import { bool, optStr, refreshPublic, str } from "./helpers";
@@ -8,7 +9,7 @@ import { bool, optStr, refreshPublic, str } from "./helpers";
 /* ------------------------------ Avaliações ------------------------------ */
 const reviewSchema = z.object({
   author_name: z.string().min(2, "Informe o nome.").max(80),
-  photo_url: z.url().nullable(),
+  photo_url: imageUrl().nullable(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().min(5, "Comentário muito curto.").max(1200),
   review_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida."),
@@ -55,7 +56,7 @@ export async function deleteReview(_: ActionState, fd: FormData): Promise<Action
 
 /* -------------------------------- Galeria ------------------------------- */
 const gallerySchema = z.object({
-  image_url: z.url("Envie uma imagem."),
+  image_url: imageUrl("Envie uma imagem."),
   alt: z.string().max(160),
   category: z.string().max(40).nullable(),
   is_active: z.boolean(),

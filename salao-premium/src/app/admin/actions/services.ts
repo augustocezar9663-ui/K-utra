@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { imageUrl } from "@/lib/validation";
 import { type ActionState, dbError, done, fail, zodFieldErrors } from "@/lib/action-result";
 import { assertAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/format";
@@ -14,7 +15,7 @@ const schema = z.object({
   duration_minutes: z.number().int().min(5, "Mínimo de 5 minutos.").max(600),
   price_cents: z.number().int().min(0, "Preço inválido."),
   price_from: z.boolean(),
-  image_url: z.url("URL de imagem inválida.").nullable(),
+  image_url: imageUrl("URL de imagem inválida.").nullable(),
   is_active: z.boolean(),
   sort_order: z.number().int().min(0).max(999),
 });

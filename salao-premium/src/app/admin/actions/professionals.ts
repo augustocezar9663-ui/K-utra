@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { imageUrl } from "@/lib/validation";
 import { type ActionState, dbError, done, fail, zodFieldErrors } from "@/lib/action-result";
 import { assertAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/format";
@@ -11,7 +12,7 @@ const schema = z.object({
   slug: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug inválido."),
   specialty: z.string().max(60).nullable(),
   bio: z.string().max(800).nullable(),
-  photo_url: z.url("URL inválida.").nullable(),
+  photo_url: imageUrl("URL inválida.").nullable(),
   instagram: z.string().max(60).nullable(),
   is_active: z.boolean(),
   sort_order: z.number().int().min(0).max(999),

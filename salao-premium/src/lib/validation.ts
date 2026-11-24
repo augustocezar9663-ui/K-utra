@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { onlyDigits } from "./format";
 
+/**
+ * Imagem enviada pelo painel (URL http/https do Storage) ou arquivo do próprio
+ * site em /public (ex.: "/galeria/foto.jpg"). Caminhos relativos não podem
+ * subir diretórios nem apontar para outro domínio ("//host").
+ */
+export const imageUrl = (message = "URL de imagem inválida.") =>
+  z.union([
+    z.url({ protocol: /^https?$/, message }),
+    z.string().regex(/^\/(?!\/)(?!.*\.\.)[\w\-./%]+\.(?:jpe?g|png|webp|avif|gif|svg)$/i, message),
+  ]);
+
 const phone = z
   .string()
   .trim()

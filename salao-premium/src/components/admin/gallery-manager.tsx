@@ -64,7 +64,7 @@ function GalleryForm({ image, onDone }: { image: GalleryImage | null; onDone: ()
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="field-label" htmlFor="g-cat">Categoria</label>
-          <input id="g-cat" name="category" defaultValue={image?.category ?? ""} className="field" placeholder="Cor, Corte..." />
+          <input id="g-cat" name="category" defaultValue={image?.category ?? ""} className="field" placeholder="Degradê, Mullet..." />
         </div>
         <div>
           <label className="field-label" htmlFor="g-ord">Ordem</label>

@@ -1,12 +1,13 @@
 "use server";
 
 import { z } from "zod";
+import { imageUrl } from "@/lib/validation";
 import { type ActionState, dbError, done, fail, zodFieldErrors } from "@/lib/action-result";
 import { assertAdmin } from "@/lib/auth";
 import { onlyDigits } from "@/lib/format";
 import { optStr, bool, parseHours, refreshPublic, str } from "./helpers";
 
-const optUrl = z.url("URL inválida.").nullable();
+const optUrl = imageUrl("URL inválida.").nullable();
 const schema = z.object({
   name: z.string().min(2, "Informe o nome do salão.").max(80),
   tagline: z.string().max(40),
