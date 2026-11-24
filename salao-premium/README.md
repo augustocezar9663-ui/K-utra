@@ -13,9 +13,11 @@ Site institucional premium + agendamento online + painel administrativo para sal
 
 **Site público**
 - Header transparente sobre o hero que vira barra de vidro fosco ao rolar; menu mobile em tela cheia.
-- Hero cinematográfico com revelação dos títulos linha a linha e parallax suave.
-- Serviços em cards (imagem, descrição, duração, preço, "a partir de", botão de agendar).
-- Sobre, Galeria editorial com filtro por categoria e lightbox (teclado: ← → Esc), Profissionais, Depoimentos (só aparece com avaliações reais publicadas), Localização (mapa, "Como chegar", horários).
+- Página enxuta, em uma rolagem contínua: Hero de vidro (WebGL) → Serviços → Galeria → Sobre → (Depoimentos) → Contato.
+- Serviços em formato de cardápio (nome, duração, descrição, preço, "a partir de"); cada linha abre o agendamento já com o serviço marcado.
+- Galeria com as fotos reais do salão em painel escuro, filtro por categoria e lightbox (teclado: ← → Esc).
+- Sobre (texto), Depoimentos (só aparece com avaliações reais publicadas), Contato (telefone, WhatsApp, horários; mapa e "Como chegar" quando o endereço é cadastrado).
+- Imagens: o site só mostra fotografias reais (galeria e, se enviadas, fotos dos profissionais no agendamento) — nenhuma ilustração ou imagem de preenchimento.
 - Botão flutuante de WhatsApp (dúvidas / solicitar confirmação), com aviso de que a mensagem só é enviada quando o cliente tocar em enviar.
 - SEO: metadata, Open Graph com imagem gerada, `sitemap.xml`, `robots.txt`, JSON-LD `HairSalon`, página 404 e página de erro.
 - Acessibilidade: `prefers-reduced-motion` respeitado em todas as animações, foco visível, link "pular para o conteúdo", labels/aria nos formulários, alvos de toque ≥ 44px.
@@ -33,7 +35,7 @@ Site institucional premium + agendamento online + painel administrativo para sal
 **Painel (`/admin`)** — protegido por login + papel `admin` (proxy + verificação no servidor + RLS no banco)
 - Dashboard: total, agendamentos do dia, pendentes, faturamento registrado (atendimentos concluídos), gráfico por dia, faturamento por mês, serviços mais procurados, próximos atendimentos.
 - Agendamentos: filtros (hoje / próximos / histórico / data / status), busca por nome, telefone ou código, confirmar, concluir, não compareceu, cancelar, reativar, reagendar (com bloqueio de conflito), WhatsApp para o cliente e histórico completo (auditoria automática por trigger).
-- Serviços, Profissionais (foto, especialidade, serviços realizados, jornada individual), Bloqueios e feriados, Galeria, Avaliações e Configurações (dados do salão, logo, fotos, endereço, contatos, redes, horários de funcionamento, dias de atendimento, grade, antecedência, confirmação automática, política de cancelamento).
+- Serviços, Profissionais (foto, especialidade, serviços realizados, jornada individual), Bloqueios e feriados, Galeria, Avaliações e Configurações (dados do salão, logo, foto principal, endereço, contatos, redes, horários de funcionamento, dias de atendimento, grade, antecedência, confirmação automática, política de cancelamento).
 
 ---
 
@@ -115,9 +117,9 @@ salao-premium/
 
 ### Fotografias
 
-O projeto **não inclui fotos de banco de imagens apresentadas como se fossem do salão**. As 4 fotos de cortes enviadas pelo salão ficam em `public/galeria/` e são cadastradas pelo `seed.sql` na *Galeria* (degradê, cacheado e mullet); a do mullet também ilustra o serviço *Corte Masculino* e a do degradê na nuca, o *Acabamento*. Onde ainda não há foto, o site exibe composições gráficas abstratas na paleta da marca.
+O projeto **não inclui fotos de banco de imagens apresentadas como se fossem do salão**. As únicas fotos do site são as 4 de cortes enviadas pelo salão: ficam em `public/galeria/` e são cadastradas pelo `seed.sql` na *Galeria* (degradê, cacheado e mullet).
 
-- Para trocar, ocultar ou remover uma foto: `/admin/galeria` (ou *Serviços*). Rodar o seed de novo não recria fotos removidas.
+- Para trocar, ocultar ou remover uma foto: `/admin/galeria`. Rodar o seed de novo não recria fotos removidas.
 - Novas fotos podem ser enviadas pelo painel (vão para o Storage do Supabase). Fotos feitas no celular, na vertical, funcionam bem: a galeria foi desenhada para retratos.
 - Publique apenas fotos de clientes que autorizaram o uso da imagem — no caso de menores de idade, com autorização do responsável (LGPD).
 

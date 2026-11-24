@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Clock, Loader2, Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Media } from "@/components/ui/media";
 import { formatDateLong, formatDuration, formatPrice, maskPhone, onlyDigits } from "@/lib/format";
 import { DUR, EASE_OUT as EASE } from "@/lib/motion";
 import { addDaysToKey, dateKeyOf } from "@/lib/time";
@@ -323,7 +323,7 @@ export function BookingWizard({
                     <EmptyNote>Nenhum serviço disponível para agendamento online no momento.</EmptyNote>
                   ) : (
                     <ul className="grid gap-3 sm:grid-cols-2">
-                      {services.map((s, i) => {
+                      {services.map((s) => {
                         const active = serviceIds.includes(s.id);
                         const compatible = active || isCompatible(s.id);
                         return (
@@ -333,21 +333,13 @@ export function BookingWizard({
                               aria-pressed={active}
                               disabled={!compatible}
                               onClick={() => toggleService(s.id)}
-                              className={`group relative flex h-full w-full items-stretch gap-4 border p-3 text-left transition-[border-color,box-shadow,opacity,transform] duration-200 ease-out active:scale-[0.985] ${
+                              className={`group relative flex h-full w-full items-stretch border p-4 text-left transition-[border-color,box-shadow,opacity,transform] duration-200 ease-out active:scale-[0.985] ${
                                 active
                                   ? "border-ink bg-white shadow-[0_18px_40px_-28px_rgba(17,17,17,0.55)]"
                                   : "border-line bg-white hover:border-ink/40"
                               } disabled:cursor-not-allowed disabled:opacity-40`}
                             >
-                              <Media
-                                src={s.image_url}
-                                alt=""
-                                seed={s.slug}
-                                tone={(["ink", "sand", "accent", "cream"] as const)[i % 4]}
-                                sizes="88px"
-                                className="h-auto min-h-24 w-20 shrink-0 sm:w-22"
-                              />
-                              <span className="flex flex-1 flex-col py-1 pr-8">
+                              <span className="flex flex-1 flex-col pr-8">
                                 <span className="font-serif text-[1.35rem] leading-tight">{s.name}</span>
                                 <span className="mt-1 flex items-center gap-1.5 text-xs text-stone">
                                   <Clock className="h-3 w-3" strokeWidth={1.5} aria-hidden="true" />
@@ -401,17 +393,22 @@ export function BookingWizard({
                           </span>
                         </ChoiceCard>
                       </li>
-                      {eligible.map((p, i) => (
+                      {eligible.map((p) => (
                         <li key={p.id}>
                           <ChoiceCard active={professionalId === p.id} onClick={() => chooseProfessional(p.id)}>
-                            <Media
-                              src={p.photo_url}
-                              alt={`Foto de ${p.name}`}
-                              seed={p.slug}
-                              tone={i % 2 ? "accent" : "sand"}
-                              sizes="72px"
-                              className="h-20 w-16 shrink-0"
-                            />
+                            {/* foto só quando o salão enviou uma; sem foto, a inicial do nome */}
+                            {p.photo_url ? (
+                              <span className="relative h-20 w-16 shrink-0 overflow-hidden bg-sand">
+                                <Image src={p.photo_url} alt="" fill sizes="64px" className="object-cover" />
+                              </span>
+                            ) : (
+                              <span
+                                aria-hidden="true"
+                                className="flex h-16 w-16 shrink-0 items-center justify-center border border-line font-serif text-2xl text-ink"
+                              >
+                                {p.name.trim().charAt(0).toUpperCase()}
+                              </span>
+                            )}
                             <span className="min-w-0">
                               {p.specialty ? <span className="label block text-accent-deep">{p.specialty}</span> : null}
                               <span className="mt-1 block font-serif text-[1.4rem] leading-tight">{p.name}</span>

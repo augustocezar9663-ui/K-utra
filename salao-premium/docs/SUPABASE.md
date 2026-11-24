@@ -49,7 +49,7 @@ Acesse `/admin/login` com esse e-mail e senha.
 ## 5. Primeiros passos no painel
 
 1. **Configurações** → nome, logo, fotos, endereço, telefone, WhatsApp (com DDD, ex.: `11999999999`), Instagram, horários de funcionamento, intervalo da grade, antecedência mínima e política de cancelamento.
-2. **Serviços** → ajuste preços, durações, descrições e envie as fotos.
+2. **Serviços** → ajuste preços, durações e descrições.
 3. **Profissionais** → cadastre a equipe, marque os serviços que cada um realiza e, se necessário, a jornada individual.
 4. **Bloqueios e feriados** → cadastre feriados, folgas e férias.
 5. **Galeria** e **Avaliações** → conteúdo real do salão.

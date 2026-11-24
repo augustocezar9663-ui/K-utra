@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { Artwork } from "@/components/ui/artwork";
 import type { GlassHeroHandle, HeroCopy, HeroLayout, HoverKey, TextItem } from "./engine";
 
 const EASE = [0.23, 1, 0.32, 1] as const;
@@ -99,7 +98,7 @@ export function GlassHero({ name, city, imageUrl }: { name: string; city: string
     >
       {/* marcador de tom: o fundo começa a clarear antes do fim da hero,
           enquanto os serviços sobem por cima dos últimos cacos */}
-      <div aria-hidden="true" data-tone="#05070c" className="pointer-events-none absolute inset-x-0 top-0 h-[160svh] lg:h-[130svh] motion-reduce:h-[100svh]" />
+      <div aria-hidden="true" data-tone="#05070c" className="pointer-events-none absolute inset-x-0 top-0 h-[130svh] motion-reduce:h-[100svh]" />
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* WebGL */}
         <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 h-full w-full motion-reduce:hidden" />
@@ -209,7 +208,7 @@ function StaticHero({
         {imageUrl ? (
           <Image src={imageUrl} alt={`Ambiente do ${name}`} fill preload sizes="100vw" quality={80} className="object-cover" />
         ) : (
-          <Artwork seed="hero-aurea" tone="ink" />
+          <div className="absolute inset-0 bg-[radial-gradient(60%_55%_at_72%_28%,rgb(31_79_214/0.32),transparent_70%)]" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-ink/30" />
       </div>

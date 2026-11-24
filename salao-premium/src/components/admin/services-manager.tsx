@@ -4,13 +4,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { Plus } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { deleteService, saveService } from "@/app/admin/actions/services";
-import { Media } from "@/components/ui/media";
 import { initialState } from "@/lib/action-result";
 import { formatDuration, formatPrice } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { ActionButton } from "./action-button";
 import { ActionForm } from "./action-form";
-import { ImageUpload } from "./image-upload";
 import { FieldError, FormMessage, SubmitButton } from "./ui";
 
 export function ServicesManager({ services }: { services: Service[] }) {
@@ -35,9 +33,8 @@ export function ServicesManager({ services }: { services: Service[] }) {
 
       <ul className="divide-y divide-line border border-line bg-white">
         {services.length === 0 ? <li className="p-6 text-sm text-stone">Nenhum serviço cadastrado.</li> : null}
-        {services.map((s, i) => (
+        {services.map((s) => (
           <li key={s.id} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
-            <Media src={s.image_url} alt="" seed={s.slug} tone={(["ink", "sand", "accent", "cream"] as const)[i % 4]} sizes="80px" className="h-20 w-16 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2 font-serif text-xl">
                 {s.name}
@@ -76,10 +73,9 @@ function ServiceForm({ service, onDone }: { service: Service | null; onDone: () 
   }, [state, onDone]);
 
   return (
-    <ActionForm action={action} className="grid gap-5 border border-ink bg-white p-5 sm:p-7 md:grid-cols-[220px_1fr]">
-      <h2 className="text-2xl md:col-span-2">{service ? `Editar: ${service.name}` : "Novo serviço"}</h2>
+    <ActionForm action={action} className="grid gap-5 border border-ink bg-white p-5 sm:p-7">
+      <h2 className="text-2xl">{service ? `Editar: ${service.name}` : "Novo serviço"}</h2>
       {service ? <input type="hidden" name="id" value={service.id} /> : null}
-      <ImageUpload name="image_url" defaultValue={service?.image_url} folder="services" aspect="aspect-[4/5]" />
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className="field-label" htmlFor="sv-name">Nome *</label>

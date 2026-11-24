@@ -63,9 +63,3 @@ select v.image_url, v.alt, v.category, v.sort_order
     ('/galeria/mullet-burst-fade.jpg',         'Mullet moderno com burst fade ao redor da orelha',                                  'Mullet',   4)
   ) as v(image_url, alt, category, sort_order)
  where not exists (select 1 from public.gallery_images g where g.image_url = v.image_url);
-
--- Fotos dos serviços: só preenche quando o serviço ainda não tem imagem.
-update public.services set image_url = '/galeria/mullet-burst-fade.jpg'
- where slug = 'corte-masculino' and image_url is null;
-update public.services set image_url = '/galeria/degrade-baixo-nuca.jpg'
- where slug = 'acabamento' and image_url is null;

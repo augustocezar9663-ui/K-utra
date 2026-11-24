@@ -1,12 +1,9 @@
 import Link from "next/link";
-import { Artwork } from "@/components/ui/artwork";
 
 export default function NotFound() {
   return (
     <main className="relative flex min-h-screen items-center overflow-hidden bg-ink text-white">
-      <div className="absolute inset-0 opacity-60">
-        <Artwork seed="404" tone="ink" />
-      </div>
+      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(60%_55%_at_72%_28%,rgb(31_79_214/0.32),transparent_70%)]" />
       <div className="container-luxe relative">
         <p className="eyebrow text-accent">Erro 404</p>
         <h1 className="mt-6 max-w-3xl text-[clamp(3rem,9vw,7rem)] font-light leading-[0.95]">

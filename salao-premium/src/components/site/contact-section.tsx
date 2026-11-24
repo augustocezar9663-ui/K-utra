@@ -10,7 +10,14 @@ import { WhatsAppIcon } from "./whatsapp-icon";
 
 function InstagramIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className={className}
+      aria-hidden="true"
+    >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
@@ -27,16 +34,15 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
   const schedule = summarizeHours(hours);
 
   return (
-    <section id="contato" aria-labelledby="contato-titulo" data-tone="#ffffff" className="py-24 md:py-36">
-      <div className="container-luxe">
-        <div id="contato-titulo">
-          <SectionHeading
-            lines={["Esperamos por você,", "com hora marcada."]}
-          />
+    <section id="contato" aria-labelledby="contato-titulo" data-tone="#ffffff" className="py-20 md:py-28">
+      {/* sem endereço cadastrado não há mapa: título e contatos lado a lado */}
+      <div className={map ? "container-luxe" : "container-luxe grid gap-10 lg:grid-cols-12"}>
+        <div id="contato-titulo" className={map ? "" : "lg:col-span-5"}>
+          <SectionHeading align="stack" lines={["Esperamos por você,", "com hora marcada."]} />
         </div>
 
-        <div className="mt-16 grid gap-10 md:mt-20 lg:grid-cols-12">
-          <Reveal className="lg:col-span-5">
+        <div className={map ? "mt-12 grid gap-10 md:mt-16 lg:grid-cols-12" : "lg:col-span-7"}>
+          <Reveal className={map ? "lg:col-span-5" : ""}>
             <dl className="divide-y divide-line border-y border-line">
               {address.hasAddress ? (
                 <div className="py-6">
@@ -48,7 +54,9 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
                     {address.line1}
                     <br />
                     <span className="text-stone">{address.line2}</span>
-                    {settings.address_zip ? <span className="block text-sm text-stone">CEP {settings.address_zip}</span> : null}
+                    {settings.address_zip ? (
+                      <span className="block text-sm text-stone">CEP {settings.address_zip}</span>
+                    ) : null}
                   </dd>
                 </div>
               ) : null}
@@ -65,7 +73,12 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
                       </a>
                     ) : null}
                     {wa ? (
-                      <a className="link-underline flex w-fit items-center gap-2" href={wa} target="_blank" rel="noopener noreferrer">
+                      <a
+                        className="link-underline flex w-fit items-center gap-2"
+                        href={wa}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <WhatsAppIcon className="h-4 w-4" /> {formatPhone(settings.whatsapp)}
                       </a>
                     ) : null}
@@ -114,8 +127,8 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
             </div>
           </Reveal>
 
-          <Reveal delay={0.15} className="lg:col-span-7">
-            {map ? (
+          {map ? (
+            <Reveal delay={0.15} className="lg:col-span-7">
               <div className="relative aspect-[4/3] overflow-hidden bg-sand lg:aspect-auto lg:h-full lg:min-h-[480px]">
                 <iframe
                   title={`Mapa — ${settings.name}`}
@@ -125,12 +138,8 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
                   className="absolute inset-0 h-full w-full grayscale-[85%] contrast-[1.05]"
                 />
               </div>
-            ) : (
-              <div className="flex aspect-[4/3] items-center justify-center bg-cream p-10 text-center text-stone lg:h-full">
-                O endereço do salão será exibido aqui assim que for cadastrado.
-              </div>
-            )}
-          </Reveal>
+            </Reveal>
+          ) : null}
         </div>
       </div>
     </section>

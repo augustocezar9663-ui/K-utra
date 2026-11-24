@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { imageUrl } from "@/lib/validation";
 import { type ActionState, dbError, done, fail, zodFieldErrors } from "@/lib/action-result";
 import { assertAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/format";
@@ -15,7 +14,6 @@ const schema = z.object({
   duration_minutes: z.number().int().min(5, "Mínimo de 5 minutos.").max(600),
   price_cents: z.number().int().min(0, "Preço inválido."),
   price_from: z.boolean(),
-  image_url: imageUrl("URL de imagem inválida.").nullable(),
   is_active: z.boolean(),
   sort_order: z.number().int().min(0).max(999),
 });
@@ -33,7 +31,6 @@ export async function saveService(_: ActionState, fd: FormData): Promise<ActionS
       duration_minutes: Number(str(fd, "duration_minutes")),
       price_cents: toCents(str(fd, "price")) ?? -1,
       price_from: bool(fd, "price_from"),
-      image_url: optStr(fd, "image_url"),
       is_active: bool(fd, "is_active"),
       sort_order: Number(str(fd, "sort_order") || 0),
     });

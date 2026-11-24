@@ -33,10 +33,9 @@ export function SettingsForm({ s }: { s: BusinessSettings }) {
             <textarea id="s-description" name="description" rows={3} maxLength={600} defaultValue={s.description ?? ""} className="field" />
           </div>
         </div>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
           <ImageUpload name="logo_url" defaultValue={s.logo_url} folder="brand" label="Logotipo (PNG/SVG transparente)" aspect="aspect-[3/1]" />
           <ImageUpload name="hero_image_url" defaultValue={s.hero_image_url} folder="brand" label="Foto principal (hero)" aspect="aspect-video" />
-          <ImageUpload name="about_image_url" defaultValue={s.about_image_url} folder="brand" label="Foto do ambiente (Sobre)" aspect="aspect-[4/5]" />
         </div>
       </section>
 

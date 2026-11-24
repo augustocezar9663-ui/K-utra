@@ -168,10 +168,27 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     const portrait = L.portrait;
     const pad = (portrait ? 0.08 : 0.055) * pw;
     const items: TextItem[] = [];
-    const eb = Math.max(10, 12 * S);
+    // tudo precisa caber na largura útil do vidro (no celular as linhas
+    // longas vazavam pela borda direita): mede e reduz o corpo se preciso
+    const maxW = pw - 2 * pad;
+    const mctx = printCanvas.getContext("2d")!;
+    const widthAt = (text: string, size: number, rest: Omit<TextItem, "key" | "role" | "text" | "x" | "y" | "size">) =>
+      trackedWidth(mctx, { key: "m", role: "p", text, x: 0, y: 0, size, ...rest });
+    const fitSize = (size: number, widest: number, limit: number) => (widest > limit ? (size * limit) / widest : size);
+
+    const ebStyle = { weight: 600, serif: false, tracking: 0.3, lineHeight: 1 };
+    let eb = Math.max(10, 12 * S);
+    // o rótulo começa depois do traço (4,4 × corpo)
+    eb = Math.max(8, fitSize(eb, widthAt(copy.eyebrow, eb, ebStyle) + eb * 4.4, maxW));
     const ebY = (portrait ? 0.07 : 0.14) * ph;
-    items.push({ key: "eyebrow", role: "p", text: copy.eyebrow, x: pad, y: ebY, size: eb, weight: 600, serif: false, tracking: 0.3, lineHeight: 1 });
-    const hs = portrait ? Math.min(0.125 * pw, 0.062 * ph) : Math.min(0.074 * pw, 0.152 * ph);
+    items.push({ key: "eyebrow", role: "p", text: copy.eyebrow, x: pad, y: ebY, size: eb, ...ebStyle });
+    let hs = portrait ? Math.min(0.125 * pw, 0.062 * ph) : Math.min(0.074 * pw, 0.152 * ph);
+    const h1Widest = Math.max(
+      ...copy.lines.map((l) =>
+        widthAt(l.text, hs, { weight: l.italic ? 400 : 300, serif: true, italic: l.italic, tracking: l.italic ? -0.01 : -0.012, lineHeight: 1 }),
+      ),
+    );
+    hs = fitSize(hs, h1Widest, maxW);
     let y = ebY + eb + (portrait ? 0.035 : 0.055) * ph;
     copy.lines.forEach((l, i) => {
       items.push({
@@ -182,10 +199,24 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     });
     const ss = Math.max(13, 18 * S);
     y += (portrait ? 0.04 : 0.05) * ph;
-    copy.sub.forEach((t, i) => {
-      items.push({ key: `s${i}`, role: "p", text: t, x: pad, y: y + i * ss * 1.55, size: ss, weight: 400, serif: false, tracking: 0, lineHeight: 1 });
+    // subtítulo: mantém as quebras pensadas para telas largas quando cabem;
+    // senão, quebra de novo palavra a palavra na largura disponível
+    const subStyle = { weight: 400, serif: false, tracking: 0, lineHeight: 1 };
+    let sub = copy.sub;
+    if (Math.max(...sub.map((t) => widthAt(t, ss, subStyle))) > maxW) {
+      sub = [];
+      let line = "";
+      for (const word of copy.sub.join(" ").split(/\s+/)) {
+        const next = line ? `${line} ${word}` : word;
+        if (line && widthAt(next, ss, subStyle) > maxW) { sub.push(line); line = word; }
+        else line = next;
+      }
+      if (line) sub.push(line);
+    }
+    sub.forEach((t, i) => {
+      items.push({ key: `s${i}`, role: "p", text: t, x: pad, y: y + i * ss * 1.55, size: ss, ...subStyle });
     });
-    y += copy.sub.length * ss * 1.55 + (portrait ? 0.04 : 0.055) * ph;
+    y += sub.length * ss * 1.55 + (portrait ? 0.04 : 0.055) * ph;
     const bs = Math.max(10.5, 12.5 * S);
     const bh = Math.max(44, 58 * S);
     const bw = Math.max(210, 290 * S);

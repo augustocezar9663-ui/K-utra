@@ -14,19 +14,19 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
   const schedule = summarizeHours(hours);
   return (
     <footer className="bg-ink text-white">
-      <div className="container-luxe grid gap-14 py-20 md:grid-cols-12 md:py-24">
-        <div className="md:col-span-4">
+      <div className="container-luxe grid grid-cols-2 gap-x-6 gap-y-10 py-14 md:grid-cols-12 md:gap-14 md:py-24">
+        <div className="col-span-2 md:col-span-4">
           <Brand name={settings.name} tagline={settings.tagline} light />
           <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/70">
             Técnica, cuidado e precisão para valorizar o estilo e a personalidade de cada cliente.
           </p>
-          <Link href="/agendar" className="btn btn-accent mt-8">
+          <Link href="/agendar" className="btn btn-accent mt-6 md:mt-8">
             Agendar experiência
           </Link>
         </div>
         <nav aria-label="Rodapé" className="md:col-span-2">
           <p className="font-serif text-xl text-white">Navegação</p>
-          <ul className="mt-6 space-y-3 text-sm text-white/70">
+          <ul className="mt-4 space-y-3 text-sm text-white/70 md:mt-6">
             {NAV_LINKS.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="link-underline hover:text-white">
@@ -38,7 +38,7 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
         </nav>
         <div className="md:col-span-3">
           <p className="font-serif text-xl text-white">Contato</p>
-          <ul className="mt-6 space-y-3 text-sm text-white/70">
+          <ul className="mt-4 space-y-3 break-words text-sm text-white/70 md:mt-6">
             {address.hasAddress ? <li>{address.line1}<br />{address.line2}</li> : null}
             {settings.phone ? (
               <li>
@@ -70,9 +70,9 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
             ) : null}
           </ul>
         </div>
-        <div className="md:col-span-3">
+        <div className="col-span-2 md:col-span-3">
           <p className="font-serif text-xl text-white">Horários</p>
-          <ul className="mt-6 space-y-3 text-sm">
+          <ul className="mt-4 space-y-3 text-sm md:mt-6">
             {schedule.map((g) => (
               <li key={g.label} className="flex justify-between gap-4 border-b border-white/10 pb-3">
                 <span className="text-white/70">{g.label}</span>
