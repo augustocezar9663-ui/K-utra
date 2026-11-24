@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Facet — Designed in glass</title>
+<meta name="description" content="Facet is a real-time material studio. Author dispersion, transmission, and refraction in the browser." />
+<style>
+  @font-face {
+    font-family: "Inter";
+    src: url("https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5.1.0/files/inter-latin-wght-normal.woff2") format("woff2");
+    font-weight: 400 700;
+    font-display: swap;
+  }
+  :root { --bg: #050507; --lav: #b9abff; --green: #36d67e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: #fff; overflow: hidden; }
+  body { font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  canvas#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* Transparent DOM copy of the printed text, mapped onto the glass with matrix3d */
+  .layer { position: fixed; left: 0; top: 0; transform-origin: 0 0; color: transparent; z-index: 2; }
+  .layer * { position: absolute; white-space: pre; line-height: 1; color: transparent; text-decoration: none; }
+  .layer ::selection { background: rgba(64, 128, 255, .55); color: transparent; }
+  .layer a, .layer button { cursor: pointer; background: none; border: 0; font: inherit; }
+  .layer .hit { display: flex; align-items: center; justify-content: center; }
+  .layer.hidden { visibility: hidden; }
+
+  /* Definitions view */
+  #defs { position: fixed; inset: 0; z-index: 3; opacity: 0; pointer-events: none; }
+  #defs.on { pointer-events: auto; }
+  #defs .col { position: absolute; left: 32.4vw; width: 33.9vw; }
+  #defs h2 { font-weight: 650; font-size: 1.36vw; letter-spacing: -.022em; color: #fff; line-height: 1.2; }
+  #defs p { font-size: .73vw; line-height: 1.72; color: rgba(255,255,255,.6); margin-top: 1.05vw; }
+  #defs p b { color: #fff; font-weight: 600; }
+  #back { position: absolute; background: none; border: 0; cursor: pointer; color: #fff; font: 500 .66vw Inter, sans-serif; }
+  #back span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; transition: color .25s; }
+  #back:hover span, #back:focus-visible span { color: var(--lav); }
+  #back:focus-visible { outline: none; }
+
+  /* Static fallback (reduced motion / no WebGL) */
+  body.static canvas#gl { display: none; }
+  body.static .layer, body.static .layer * { color: inherit; }
+  body.static .panel-static {
+    position: fixed; border-radius: 14px; background: linear-gradient(160deg, #1d1d22, #121215);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 30px 80px rgba(0,0,0,.6); z-index: 1;
+  }
+  body.static #defs { background: var(--bg); }
+  body.static #back { border-radius: 8px; background: linear-gradient(160deg, #1d1d22, #121215); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+  @media (max-width: 700px) {
+    #defs .col { left: 8vw; width: 84vw; top: 18vh !important; }
+    #defs h2 { font-size: 6vw; } #defs p { font-size: 3.6vw; margin-top: 4vw; }
+    #back { font-size: 3.6vw; }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<nav class="layer" id="navLayer" aria-label="Primary"></nav>
+<main class="layer" id="panelLayer"></main>
+
+<section id="defs" aria-hidden="true" aria-labelledby="defsTitle">
+  <button id="back" type="button" aria-label="Back to the studio"><span>← Back</span></button>
+  <div class="col">
+    <h2 id="defsTitle">Real-time glass, in five terms.</h2>
+    <p><b>Iridescence</b> — A thin film on the surface interferes with itself, so the reflected colour shifts with the viewing angle: the green-to-violet sheen that slides across a piece as it tips.</p>
+    <p><b>Index of refraction</b> — How strongly light bends as it enters the material. Glass sits around 1.5; higher values pull reflections tighter and make edges read brighter.</p>
+    <p><b>Dispersion</b> — Each wavelength refracts by a slightly different amount, splitting white light into thin coloured fringes along bevels and cuts.</p>
+    <p><b>Transmission</b> — The share of light that passes through the surface rather than bouncing off it, which lets a shard tint and distort whatever sits behind it.</p>
+    <p><b>Roughness</b> — Microscopic surface scatter. Low values keep reflections crisp; higher values soften them into the smoked, satin finish of the faces.</p>
+  </div>
+</section>
+
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeInCubic = (t) => t * t * t;
+const easeOutBack = (t) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+const $ = (s) => document.querySelector(s);
+
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer = null;
+if (!reduceMotion) {
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: $("#gl"), antialias: true, powerPreference: "high-performance" });
+  } catch { renderer = null; }
+}
+const STATIC = !renderer;
+
+try {
+  const face = new FontFace("Inter", 'url("https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5.1.0/files/inter-latin-wght-normal.woff2")', { weight: "400 700" });
+  await face.load();
+  document.fonts.add(face);
+} catch { /* system font fallback */ }
+
+/* ------------------------------------------------------------------ */
+/* Layout                                                              */
+/* ------------------------------------------------------------------ */
+let W, H, L; // L = layout
+function computeLayout() {
+  W = innerWidth; H = innerHeight;
+  const phone = W < 700;
+  const mx = phone ? 16 : 0.055 * W, my = phone ? 16 : 0.085 * H;
+  const bw = W - 2 * mx, bh = H - 2 * my;
+  const S = bw / 1730;
+  const navH = 0.108 * bh, gapNav = 14;
+  const portrait = H > W;
+  // slab-local coordinates: origin at block centre, y up, 1 unit = 1 css px
+  const panel = { left: -bw / 2, right: bw / 2, top: bh / 2 - navH - gapNav, bottom: -bh / 2 };
+  panel.w = panel.right - panel.left; panel.h = panel.top - panel.bottom;
+  const nav = { left: -bw / 2, right: bw / 2, top: bh / 2, bottom: bh / 2 - navH, w: bw, h: navH };
+  const fs = (v, min) => Math.max(min, v); // keep type legible on phones
+  L = { mx, my, bw, bh, S, navH, gapNav, portrait, panel, nav, phone, fs,
+        radius: 20 * S, depth: 13 * S, bevel: 2.6 * S, gap: 14 * S };
+  L.front = L.depth + L.bevel; // z of the top face in piece space
+}
+
+/* Panel content measured in panel pixels (origin top-left, y down) */
+function contentLayout() {
+  const { panel, S, fs, portrait } = L;
+  const pw = panel.w, ph = panel.h;
+  const pad = (portrait ? 0.07 : 0.052) * pw;
+  const eb = { size: fs(11 * S, 9), y: 0.135 * ph };
+  const hs = Math.min(0.078 * pw, 0.2 * ph);
+  const h1y = eb.y + eb.size + 0.05 * ph;
+  const sub = { size: fs(18 * S, 12), y: h1y + 2 * hs * 0.97 + 0.045 * ph };
+  const pill = { w: fs(116 * S, 92), h: fs(40 * S, 32), x: pad };
+  pill.y = sub.y + sub.size * 1.5 * 2 + 0.05 * ph;
+  const btn = { size: fs(14 * S, 11.5) };
+  const foot = { size: fs(11 * S, 9), y: ph - 0.06 * ph - fs(11 * S, 9) };
+  return { pw, ph, pad, eb, hs, h1y, sub, pill, btn, foot };
+}
+
+/* ------------------------------------------------------------------ */
+/* Printed content (canvas textures) + transparent DOM copy            */
+/* ------------------------------------------------------------------ */
+const hover = { pill: false, read: false, link: -1 };
+const hooks = { shatter: () => {} };
+const PDPR = Math.min(2.5, Math.max(1.5, devicePixelRatio || 1));
+const panelCanvas = document.createElement("canvas");
+const navCanvas = document.createElement("canvas");
+const FONT = 'Inter, system-ui, sans-serif';
+const SUB_LINES = ["Author dispersion, transmission, and refraction in the browser. Live", "previews, real materials."];
+const NAV_LINKS = ["Studio", "Materials", "Pricing"];
+
+function setFont(ctx, weight, size, tracking) {
+  ctx.font = `${weight} ${size}px ${FONT}`;
+  ctx.letterSpacing = `${tracking * size}px`;
+}
+
+function drawPanel() {
+  const C = contentLayout();
+  const c = panelCanvas, ctx = c.getContext("2d");
+  c.width = Math.round(C.pw * PDPR); c.height = Math.round(C.ph * PDPR);
+  ctx.setTransform(PDPR, 0, 0, PDPR, 0, 0);
+  ctx.clearRect(0, 0, C.pw, C.ph);
+  ctx.textBaseline = "top";
+
+  setFont(ctx, 500, C.eb.size, 0.2);
+  ctx.fillStyle = "rgba(255,255,255,.38)";
+  ctx.fillText("REAL-TIME MATERIAL STUDIO", C.pad, C.eb.y);
+
+  setFont(ctx, 500, C.hs, -0.045);
+  const g = ctx.createLinearGradient(0, C.h1y, 0, C.h1y + C.hs * 1.97);
+  g.addColorStop(0, "#dcdce0"); g.addColorStop(1, "#bdbdc3");
+  ctx.fillStyle = g;
+  ctx.fillText("Designed", C.pad - C.hs * 0.04, C.h1y);
+  ctx.fillText("in glass.", C.pad - C.hs * 0.04, C.h1y + C.hs * 0.97);
+
+  setFont(ctx, 400, C.sub.size, -0.005);
+  ctx.fillStyle = "rgba(255,255,255,.55)";
+  SUB_LINES.forEach((t, i) => ctx.fillText(t, C.pad, C.sub.y + i * C.sub.size * 1.5));
+
+  // "Open studio" pill — light, green on hover
+  const p = C.pill;
+  ctx.fillStyle = hover.pill ? "#36d67e" : "#ececef";
+  ctx.beginPath(); ctx.roundRect(p.x, p.y, p.w, p.h, 6 * L.S); ctx.fill();
+  setFont(ctx, 550, C.btn.size, -0.01);
+  ctx.fillStyle = "#0b0b0d"; ctx.textAlign = "center";
+  ctx.fillText("Open studio", p.x + p.w / 2, p.y + (p.h - C.btn.size) / 2 + C.btn.size * 0.02);
+  ctx.textAlign = "left";
+
+  // "Read paper →"
+  const rx = p.x + p.w + 26 * L.S + 6, ry = p.y + (p.h - C.btn.size) / 2;
+  ctx.fillStyle = hover.read ? "#fff" : "rgba(255,255,255,.86)";
+  ctx.fillText("Read paper →", rx, ry);
+  const rw = ctx.measureText("Read paper →").width;
+  if (hover.read) ctx.fillRect(rx, ry + C.btn.size * 1.18, rw, Math.max(1, C.btn.size * 0.07));
+
+  setFont(ctx, 400, C.foot.size, 0.02);
+  ctx.fillStyle = "rgba(255,255,255,.34)";
+  ctx.fillText("© Facet Lab", C.pad, C.foot.y);
+  ctx.textAlign = "right";
+  ctx.fillText("KHR_materials_dispersion", C.pw - C.pad, C.foot.y);
+  ctx.textAlign = "left";
+
+  C.read = { x: rx, y: ry, w: rw };
+  return C;
+}
+
+function navLayout() {
+  const { nav, S, fs } = L;
+  const pad = 0.028 * nav.w, size = fs(15 * S, 11), mark = fs(18 * S, 12);
+  const cy = nav.h / 2;
+  return { pad, size, mark, cy, w: nav.w, h: nav.h, linkGap: fs(34 * S, 16) };
+}
+
+function drawNav() {
+  const N = navLayout();
+  const c = navCanvas, ctx = c.getContext("2d");
+  c.width = Math.round(N.w * PDPR); c.height = Math.round(N.h * PDPR);
+  ctx.setTransform(PDPR, 0, 0, PDPR, 0, 0);
+  ctx.clearRect(0, 0, N.w, N.h);
+  ctx.textBaseline = "top";
+  // square mark
+  ctx.fillStyle = "#e9e9ee";
+  ctx.beginPath(); ctx.roundRect(N.pad, N.cy - N.mark / 2, N.mark, N.mark, N.mark * 0.18); ctx.fill();
+  ctx.fillStyle = "#17171b";
+  ctx.beginPath(); ctx.roundRect(N.pad + N.mark * 0.3, N.cy - N.mark * 0.2, N.mark * 0.4, N.mark * 0.4, N.mark * 0.06); ctx.fill();
+  setFont(ctx, 600, N.size * 1.12, -0.02);
+  ctx.fillStyle = "#f2f2f5";
+  const brandX = N.pad + N.mark + N.mark * 0.55;
+  ctx.fillText("Facet", brandX, N.cy - N.size * 1.12 / 2);
+  // links, centred
+  setFont(ctx, 500, N.size, -0.005);
+  const widths = NAV_LINKS.map((t) => ctx.measureText(t).width);
+  const total = widths.reduce((a, b) => a + b, 0) + N.linkGap * (NAV_LINKS.length - 1);
+  let x = N.w / 2 - total / 2;
+  N.links = [];
+  NAV_LINKS.forEach((t, i) => {
+    ctx.fillStyle = hover.link === i ? "rgba(255,255,255,.95)" : "rgba(255,255,255,.6)";
+    ctx.fillText(t, x, N.cy - N.size / 2);
+    N.links.push({ x, w: widths[i] });
+    x += widths[i] + N.linkGap;
+  });
+  ctx.fillStyle = hover.link === 3 ? "#fff" : "rgba(255,255,255,.82)";
+  ctx.textAlign = "right";
+  ctx.fillText("Sign in", N.w - N.pad, N.cy - N.size / 2);
+  ctx.textAlign = "left";
+  N.signW = ctx.measureText("Sign in").width;
+  return N;
+}
+
+/* DOM copies (same positions, transparent ink) */
+const panelLayer = $("#panelLayer"), navLayer = $("#navLayer");
+function el(tag, cls, text, style) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  Object.assign(e.style, style);
+  return e;
+}
+const px = (v) => `${v}px`;
+function buildPanelDOM(C) {
+  panelLayer.replaceChildren();
+  Object.assign(panelLayer.style, { width: px(C.pw), height: px(C.ph) });
+  const f = (size, weight, tracking) => ({ fontSize: px(size), fontWeight: weight, letterSpacing: `${tracking}em` });
+  panelLayer.append(
+    el("p", "", "REAL-TIME MATERIAL STUDIO", { left: px(C.pad), top: px(C.eb.y), ...f(C.eb.size, 500, 0.2) }),
+    el("h1", "", "Designed\nin glass.", { left: px(C.pad - C.hs * 0.04), top: px(C.h1y), lineHeight: "0.97", ...f(C.hs, 500, -0.045) }),
+    el("p", "", SUB_LINES.join("\n"), { left: px(C.pad), top: px(C.sub.y), lineHeight: "1.5", ...f(C.sub.size, 400, -0.005) }),
+  );
+  const pill = el("button", "hit", "Open studio", { left: px(C.pill.x), top: px(C.pill.y), width: px(C.pill.w), height: px(C.pill.h), ...f(C.btn.size, 550, -0.01) });
+  pill.type = "button";
+  pill.addEventListener("pointerenter", () => { hover.pill = true; refreshPanel(); });
+  pill.addEventListener("pointerleave", () => { hover.pill = false; refreshPanel(); });
+  const read = el("a", "", "Read paper →", { left: px(C.read.x), top: px(C.read.y - 6), padding: "6px 0", ...f(C.btn.size, 550, -0.01) });
+  read.href = "#paper";
+  read.addEventListener("pointerenter", () => { hover.read = true; refreshPanel(); });
+  read.addEventListener("pointerleave", () => { hover.read = false; refreshPanel(); });
+  read.addEventListener("click", (e) => { e.preventDefault(); hooks.shatter(); });
+  panelLayer.append(pill, read,
+    el("small", "", "© Facet Lab", { left: px(C.pad), top: px(C.foot.y), ...f(C.foot.size, 400, 0.02) }),
+    el("small", "", "KHR_materials_dispersion", { right: px(C.pad), top: px(C.foot.y), ...f(C.foot.size, 400, 0.02) }),
+  );
+}
+function buildNavDOM(N) {
+  navLayer.replaceChildren();
+  Object.assign(navLayer.style, { width: px(N.w), height: px(N.h) });
+  const brand = el("a", "", "Facet", { left: px(N.pad), top: px(N.cy - N.size * 0.56), paddingLeft: px(N.mark * 1.55), fontSize: px(N.size * 1.12), fontWeight: 600, letterSpacing: "-.02em" });
+  brand.href = "#";
+  navLayer.append(brand);
+  const items = [...NAV_LINKS.map((t, i) => ({ t, x: N.links[i].x, i })), { t: "Sign in", x: N.w - N.pad - N.signW, i: 3 }];
+  for (const it of items) {
+    const a = el("a", "", it.t, { left: px(it.x), top: px(N.cy - N.size / 2 - 8), padding: "8px 0", fontSize: px(N.size), fontWeight: 500, letterSpacing: "-.005em" });
+    a.href = "#";
+    a.addEventListener("pointerenter", () => { hover.link = it.i; refreshNav(); });
+    a.addEventListener("pointerleave", () => { hover.link = -1; refreshNav(); });
+    navLayer.append(a);
+  }
+}
+
+let panelTex = null, navTex = null;
+function refreshPanel() { drawPanel(); if (panelTex) panelTex.needsUpdate = true; if (STATIC) staticPanelPaint(); }
+function refreshNav() { drawNav(); if (navTex) navTex.needsUpdate = true; if (STATIC) staticPanelPaint(); }
+
+/* ------------------------------------------------------------------ */
+/* Static fallback                                                     */
+/* ------------------------------------------------------------------ */
+function staticPanelPaint() { /* canvases are shown as images inside the static panels */ }
+function setupStatic() {
+  document.body.classList.add("static");
+  const place = () => {
+    computeLayout();
+    const C = drawPanel(), N = drawNav();
+    buildPanelDOM(C); buildNavDOM(N);
+    const ox = L.mx, oy = L.my;
+    navLayer.style.transform = `translate(${ox}px, ${oy}px)`;
+    panelLayer.style.transform = `translate(${ox}px, ${oy + L.navH + L.gapNav}px)`;
+    document.querySelectorAll(".panel-static").forEach((n) => n.remove());
+    for (const [layer, w, h, top] of [[navLayer, N.w, N.h, oy], [panelLayer, C.pw, C.ph, oy + L.navH + L.gapNav]]) {
+      const bg = el("div", "panel-static", null, { left: px(ox), top: px(top), width: px(w), height: px(h) });
+      document.body.insertBefore(bg, layer);
+    }
+    // In static mode the DOM text is the visible text
+    panelLayer.querySelector("button").style.cssText += ";background:#ececef;color:#0b0b0d;border-radius:6px";
+    const h1 = panelLayer.querySelector("h1");
+    h1.style.background = "linear-gradient(#dcdce0,#bdbdc3)"; h1.style.webkitBackgroundClip = "text"; h1.style.color = "transparent"; h1.style.paddingBottom = "0.14em";
+    panelLayer.querySelectorAll("p")[0].style.color = "rgba(255,255,255,.38)";
+    panelLayer.querySelectorAll("p")[1].style.color = "rgba(255,255,255,.55)";
+    panelLayer.querySelectorAll("small").forEach((s) => (s.style.color = "rgba(255,255,255,.34)"));
+    navLayer.querySelectorAll("a").forEach((a, i) => (a.style.color = i === 0 ? "#f2f2f5" : "rgba(255,255,255,.7)"));
+  };
+  place();
+  addEventListener("resize", place);
+  const defs = $("#defs");
+  const placeBack = () => Object.assign($("#back").style, { left: "14.7vw", top: "16.9vh", width: "14vw", height: "10.8vh" });
+  placeBack();
+  $("#back span").style.cssText += ";left:50%;top:50%";
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("a[href='#paper']")) { e.preventDefault(); defs.style.opacity = 1; defs.classList.add("on"); defs.setAttribute("aria-hidden", "false"); }
+  });
+  $("#back").addEventListener("click", () => { defs.style.opacity = 0; defs.classList.remove("on"); defs.setAttribute("aria-hidden", "true"); });
+  positionDefs();
+}
+function positionDefs() { $("#defs .col").style.top = `calc(35.9vh - 1.36vw * 0.95)`; }
+
+if (STATIC) {
+  setupStatic();
+} else {
+  startGL();
+}
+
+/* ------------------------------------------------------------------ */
+/* WebGL                                                               */
+/* ------------------------------------------------------------------ */
+function startGL() {
+  computeLayout();
+  positionDefs();
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("#050507");
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const camera = new THREE.PerspectiveCamera(30, 1, 1, 20000);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.42;
+
+  const key = new THREE.DirectionalLight(0xeef2ff, 0.8);
+  scene.add(key);
+  const fill = new THREE.AmbientLight(0xffffff, 0.04);
+  scene.add(fill);
+
+  /* -------------------- glass material + cursor glow -------------------- */
+  const glow = { uPointer: { value: new THREE.Vector3(1e6, 1e6, 0) }, uGlow: { value: 0 }, uS: { value: 1 } };
+  function glassMaterial(withGlow = true, irid = 0.55) {
+    const m = new THREE.MeshPhysicalMaterial({
+      color: 0x17171b, roughness: 0.36, metalness: 0,
+      clearcoat: 0.7, clearcoatRoughness: 0.12, specularIntensity: 0.7,
+      iridescence: irid, iridescenceIOR: 1.3, iridescenceThicknessRange: [250, 650],
+      envMapIntensity: 1,
+    });
+    if (withGlow) {
+      m.onBeforeCompile = (sh) => {
+        Object.assign(sh.uniforms, glow);
+        sh.vertexShader = sh.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vWPos;")
+          .replace("#include <project_vertex>", "#include <project_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+        sh.fragmentShader = sh.fragmentShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vWPos;\nuniform vec3 uPointer;\nuniform float uGlow;\nuniform float uS;")
+          .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+            float gd = distance(vWPos, uPointer) / (300.0 * uS);
+            totalEmissiveRadiance += vec3(.42, .37, .62) * .16 * uGlow * exp(-1.6 * gd * gd);`);
+      };
+      m.customProgramCacheKey = () => "facet-glass-glow";
+    }
+    return m;
+  }
+
+  /* --------------------------- geometry helpers ------------------------- */
+  function roundedInsetShape(pts, inset, r) {
+    const n = pts.length;
+    let area = 0;
+    for (let i = 0; i < n; i++) { const a = pts[i], b = pts[(i + 1) % n]; area += a.x * b.y - b.x * a.y; }
+    const ccw = area > 0;
+    const lines = [];
+    for (let i = 0; i < n; i++) {
+      const a = pts[i], b = pts[(i + 1) % n];
+      let dx = b.x - a.x, dy = b.y - a.y; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+      const nx = ccw ? -dy : dy, ny = ccw ? dx : -dx;
+      lines.push({ px: a.x + nx * inset, py: a.y + ny * inset, dx, dy });
+    }
+    const v = [];
+    for (let i = 0; i < n; i++) {
+      const l1 = lines[(i - 1 + n) % n], l2 = lines[i];
+      const den = l1.dx * l2.dy - l1.dy * l2.dx;
+      if (Math.abs(den) < 1e-6) { v.push({ x: l2.px, y: l2.py }); continue; }
+      const t = ((l2.px - l1.px) * l2.dy - (l2.py - l1.py) * l2.dx) / den;
+      v.push({ x: l1.px + l1.dx * t, y: l1.py + l1.dy * t });
+    }
+    const shape = new THREE.Shape();
+    for (let i = 0; i < n; i++) {
+      const p = v[i], a = v[(i - 1 + n) % n], b = v[(i + 1) % n];
+      const la = Math.hypot(a.x - p.x, a.y - p.y) || 1, lb = Math.hypot(b.x - p.x, b.y - p.y) || 1;
+      const ua = { x: (a.x - p.x) / la, y: (a.y - p.y) / la }, ub = { x: (b.x - p.x) / lb, y: (b.y - p.y) / lb };
+      const ang = Math.acos(clamp(ua.x * ub.x + ua.y * ub.y, -1, 1));
+      const t = Math.min(r / Math.tan(Math.max(ang, 0.05) / 2), la * 0.45, lb * 0.45);
+      const pin = { x: p.x + ua.x * t, y: p.y + ua.y * t }, pout = { x: p.x + ub.x * t, y: p.y + ub.y * t };
+      if (i === 0) shape.moveTo(pin.x, pin.y); else shape.lineTo(pin.x, pin.y);
+      shape.quadraticCurveTo(p.x, p.y, pout.x, pout.y);
+    }
+    shape.closePath();
+    return { shape, verts: v };
+  }
+
+  function extrude(shape, depth, bevel, curveSegments = 5) {
+    return new THREE.ExtrudeGeometry(shape, {
+      depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 3, curveSegments,
+    });
+  }
+
+  /* --------------------------- cut pattern ------------------------------ */
+  const P = {
+    TL: [0, 0, 0], TR: [1, 0, 0], BR: [1, 1, 0], BL: [0, 1, 0],
+    tAB: [0.22, 0, 1], tBC: [0.515, 0, 1], tCE: [0.84, 0, 1],
+    bAD: [0.34, 1, 1], bDE: [0.865, 1, 1],
+    J0: [0.385, 0.72, 2], J1: [0.48, 0.62, 2], J2: [0.716, 0.49, 2],
+  }; // [x, y, kind] kind: 0 fixed, 1 edge (x only), 2 junction (x+y)
+  const CELLS = {
+    A: ["TL", "tAB", "J0", "bAD", "BL"],
+    B: ["tAB", "tBC", "J1", "J0"],
+    C: ["tBC", "tCE", "J2", "J1"],
+    D: ["J0", "J1", "J2", "bDE", "bAD"],
+    E: ["tCE", "TR", "BR", "bDE", "J2"],
+  };
+  const drift = {};
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (const k of Object.keys(P)) {
+    drift[k] = { px: 10 + rnd() * 10, py: 10 + rnd() * 10, fx: rnd() * 6.28, fy: rnd() * 6.28 };
+  }
+  const patPointer = { x: -9, y: -9, tx: -9, ty: -9 };
+
+  function patternPoints(t) {
+    const out = {};
+    for (const [k, [x0, y0, kind]] of Object.entries(P)) {
+      let x = x0, y = y0;
+      if (kind > 0) x += 0.03 * Math.sin((t / drift[k].px) * 6.283 + drift[k].fx);
+      if (kind === 2) y += 0.05 * Math.sin((t / drift[k].py) * 6.283 + drift[k].fy);
+      if (kind > 0) {
+        const dx = x - patPointer.x, dy = y - patPointer.y, d = Math.hypot(dx, dy);
+        if (d < 0.6 && d > 1e-4) {
+          const f = 0.05 * Math.pow(1 - d / 0.6, 2);
+          x += (dx / d) * f;
+          if (kind === 2) y += (dy / d) * f;
+        }
+      }
+      out[k] = { x: clamp(x, 0.02, 0.98), y: kind === 2 ? clamp(y, 0.05, 0.95) : y };
+      if (kind === 0) out[k] = { x: x0, y: y0 };
+    }
+    return out;
+  }
+  // pattern space (u,v) -> slab coords
+  function toSlab(u, v) {
+    const { panel, portrait } = L;
+    const [x, y] = portrait ? [v, u] : [u, v];
+    return { x: panel.left + x * panel.w, y: panel.top - y * panel.h };
+  }
+  function fromSlab(sx, sy) {
+    const { panel, portrait } = L;
+    const x = (sx - panel.left) / panel.w, y = (panel.top - sy) / panel.h;
+    return portrait ? { u: y, v: x } : { u: x, v: y };
+  }
+
+  /* ------------------------------ pieces -------------------------------- */
+  const slab = new THREE.Group();
+  scene.add(slab);
+  const pieces = []; // {id, group, inner, glass, print, mat, isNav, centroid, spring..., fly...}
+
+  function makePiece(id, isNav) {
+    const group = new THREE.Group(), inner = new THREE.Group();
+    group.add(inner); slab.add(group);
+    const mat = glassMaterial(true);
+    const glass = new THREE.Mesh(new THREE.BufferGeometry(), mat);
+    const printMat = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, toneMapped: false });
+    const print = new THREE.Mesh(new THREE.BufferGeometry(), printMat);
+    print.renderOrder = 2;
+    inner.add(glass, print);
+    glass.userData.piece = id;
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const axis = new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-0.6, 0.6)).normalize();
+    return {
+      id, isNav, group, inner, glass, print, mat, printMat,
+      centroid: new THREE.Vector2(), half: new THREE.Vector2(1, 1),
+      lift: { x: 0, v: 0 }, tx: { x: 0, v: 0 }, ty: { x: 0, v: 0 },
+      fly: { e: 1, axis, spin: rand(2.0, 3.6), out: rand(320, 620), down: rand(80, 260), vz: rand(420, 800) },
+    };
+  }
+
+  pieces.push(makePiece("nav", true));
+  for (const id of Object.keys(CELLS)) pieces.push(makePiece(id, false));
+
+  function setPieceGeometry(pc, verts2d, uvRect, inset) {
+    const { shape, verts } = roundedInsetShape(verts2d, inset, L.radius);
+    // centroid + extents for tipping
+    let cx = 0, cy = 0, minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const p of verts) { cx += p.x; cy += p.y; minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y); }
+    cx /= verts.length; cy /= verts.length;
+    pc.centroid.set(cx, cy); pc.half.set(Math.max(1, (maxX - minX) / 2), Math.max(1, (maxY - minY) / 2));
+    pc.inner.position.set(-cx, -cy, 0);
+
+    const g = extrude(shape, L.depth, L.bevel);
+    pc.glass.geometry.dispose(); pc.glass.geometry = g;
+
+    const sg = new THREE.ShapeGeometry(shape, 5);
+    const pos = sg.attributes.position, uv = sg.attributes.uv;
+    for (let i = 0; i < pos.count; i++) {
+      uv.setXY(i, (pos.getX(i) - uvRect.left) / uvRect.w, (pos.getY(i) - uvRect.bottom) / uvRect.h);
+    }
+    uv.needsUpdate = true;
+    sg.translate(0, 0, L.front + 0.35);
+    pc.print.geometry.dispose(); pc.print.geometry = sg;
+  }
+
+  function rebuild(t) {
+    const pts = patternPoints(t);
+    const half = L.gap / 2;
+    for (const pc of pieces) {
+      if (pc.isNav) continue;
+      const v = CELLS[pc.id].map((k) => toSlab(pts[k].x, pts[k].y));
+      setPieceGeometry(pc, v, L.panel, half);
+    }
+  }
+  function buildNavPiece() {
+    const n = L.nav;
+    const v = [{ x: n.left, y: n.bottom }, { x: n.right, y: n.bottom }, { x: n.right, y: n.top }, { x: n.left, y: n.top }];
+    setPieceGeometry(pieces[0], v, n, 0);
+  }
+
+  /* ------------------------------ textures ------------------------------ */
+  function makeTextures() {
+    const C = drawPanel(), N = drawNav();
+    panelTex?.dispose(); navTex?.dispose();
+    panelTex = new THREE.CanvasTexture(panelCanvas);
+    navTex = new THREE.CanvasTexture(navCanvas);
+    for (const t of [panelTex, navTex]) { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.minFilter = THREE.LinearMipmapLinearFilter; }
+    for (const pc of pieces) { pc.printMat.map = pc.isNav ? navTex : panelTex; pc.printMat.needsUpdate = true; }
+    buildPanelDOM(C); buildNavDOM(N);
+  }
+
+  /* ---------------------------- back sliver ----------------------------- */
+  const sliver = { group: new THREE.Group(), mesh: null, scale: 0, hover: 0, tx: { x: 0, v: 0 }, ty: { x: 0, v: 0 } };
+  scene.add(sliver.group);
+  const sliverMat = glassMaterial(false, 0.35);
+  function buildSliver() {
+    const k = W / 1918;
+    const F = [[0.147, 0.243], [0.252, 0.169], [0.287, 0.277], [0.151, 0.258]];
+    const v = F.map(([fx, fy]) => ({ x: fx * W - W / 2, y: H / 2 - fy * H }));
+    const cx = v.reduce((a, p) => a + p.x, 0) / 4, cy = v.reduce((a, p) => a + p.y, 0) / 4;
+    const local = v.map((p) => ({ x: p.x - cx, y: p.y - cy }));
+    const { shape } = roundedInsetShape(local, 0, 9 * k);
+    const g = new THREE.ExtrudeGeometry(shape, { depth: 11 * k, bevelEnabled: true, bevelThickness: 2.2 * k, bevelSize: 1.8 * k, bevelSegments: 3, curveSegments: 6 });
+    g.translate(0, 0, -11 * k);
+    if (sliver.mesh) { sliver.mesh.geometry.dispose(); sliver.mesh.geometry = g; }
+    else { sliver.mesh = new THREE.Mesh(g, sliverMat); sliver.group.add(sliver.mesh); }
+    sliver.group.position.set(cx, cy, 0);
+    // DOM label + hit area
+    const back = $("#back");
+    Object.assign(back.style, { left: "14.7vw", top: "16.9vh", width: "14vw", height: "10.8vh" });
+    Object.assign($("#back span").style, { left: `${((0.219 - 0.147) / 0.14) * 100}%`, top: `${((0.238 - 0.169) / 0.108) * 100}%` });
+  }
+
+  /* ------------------------------- resize ------------------------------- */
+  function resize() {
+    computeLayout();
+    renderer.setSize(W, H, false);
+    camera.aspect = W / H;
+    camera.position.set(0, 0, (H / 2) / Math.tan(THREE.MathUtils.degToRad(15)));
+    camera.near = 10; camera.far = camera.position.z * 4;
+    camera.updateProjectionMatrix();
+    slab.position.set((L.mx + L.bw / 2) - W / 2, H / 2 - (L.my + L.bh / 2), 0);
+    key.position.set(-0.6 * W, 0.7 * H, camera.position.z);
+    glow.uS.value = L.S;
+    buildNavPiece();
+    rebuild(clock.elapsedTime);
+    makeTextures();
+    buildSliver();
+  }
+
+  /* ------------------------------ pointer ------------------------------- */
+  const pointer = { x: 0, y: 0, inside: false, nx: 0, ny: 0, cx: 0, cy: 0 };
+  addEventListener("pointermove", (e) => {
+    pointer.cx = e.clientX; pointer.cy = e.clientY; pointer.inside = true;
+    pointer.nx = (e.clientX / W) * 2 - 1; pointer.ny = -((e.clientY / H) * 2 - 1);
+  }, { passive: true });
+  document.documentElement.addEventListener("pointerleave", () => { pointer.inside = false; });
+  addEventListener("blur", () => { pointer.inside = false; });
+
+  /* ----------------------------- state machine -------------------------- */
+  // mode: "intro" (fly in) -> "idle" -> "out" (shatter) -> "defs" -> "in" (back) -> "idle"
+  let mode = "intro", modeT = 0;
+  const defs = $("#defs");
+  function setLayerVisible(v) { panelLayer.classList.toggle("hidden", !v); navLayer.classList.toggle("hidden", !v); }
+  function shatter() {
+    if (mode !== "idle") return;
+    mode = "out"; modeT = 0; hoveredId = null;
+    hover.read = false; refreshPanel();
+    setLayerVisible(false);
+    defs.setAttribute("aria-hidden", "false");
+  }
+  function goBack() {
+    if (mode !== "defs" && mode !== "out") return;
+    mode = "in"; modeT = 0;
+    defs.classList.remove("on");
+    defs.setAttribute("aria-hidden", "true");
+  }
+  $("#back").addEventListener("click", goBack);
+  $("#back").addEventListener("pointerenter", () => (sliver.hoverDom = true));
+  $("#back").addEventListener("pointerleave", () => (sliver.hoverDom = false));
+  addEventListener("keydown", (e) => { if (e.key === "Escape") goBack(); });
+
+  /* -------------------------- projection helpers ------------------------ */
+  const tmpV = new THREE.Vector3();
+  function screenOf(x, y, z, obj) {
+    tmpV.set(x, y, z).applyMatrix4(obj.matrixWorld).project(camera);
+    return [(tmpV.x * 0.5 + 0.5) * W, (-tmpV.y * 0.5 + 0.5) * H];
+  }
+  function quadToCss(w, h, p0, p1, p2, p3) {
+    // maps rect (0,0)-(w,h) to quad TL p0, TR p1, BR p2, BL p3
+    const [x0, y0] = p0, [x1, y1] = p1, [x2, y2] = p2, [x3, y3] = p3;
+    const dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3;
+    const dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+    const den = dx1 * dy2 - dx2 * dy1;
+    const g = (dx3 * dy2 - dx2 * dy3) / den, hh = (dx1 * dy3 - dx3 * dy1) / den;
+    let a = x1 - x0 + g * x1, b = x3 - x0 + hh * x3, c = x0;
+    let d = y1 - y0 + g * y1, e = y3 - y0 + hh * y3, f = y0;
+    const G = g / w, HH = hh / h;
+    a /= w; d /= w; b /= h; e /= h;
+    return `matrix3d(${a},${d},0,${G},${b},${e},0,${HH},0,0,1,0,${c},${f},0,1)`;
+  }
+  function mapLayers() {
+    const z = L.front;
+    for (const [layer, r] of [[panelLayer, L.panel], [navLayer, L.nav]]) {
+      const p0 = screenOf(r.left, r.top, z, slab), p1 = screenOf(r.right, r.top, z, slab);
+      const p2 = screenOf(r.right, r.bottom, z, slab), p3 = screenOf(r.left, r.bottom, z, slab);
+      layer.style.transform = quadToCss(r.w, r.h, p0, p1, p2, p3);
+    }
+  }
+
+  /* ------------------------------- loop --------------------------------- */
+  const clock = new THREE.Clock();
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  const plane = new THREE.Plane();
+  const tilt = { x: 0, y: 0 };
+  let hoveredId = null, lastRebuild = 0;
+  const qTip = new THREE.Quaternion(), qFly = new THREE.Quaternion(), eul = new THREE.Euler();
+  const slabNormal = new THREE.Vector3(), slabPoint = new THREE.Vector3(), hit = new THREE.Vector3(), localHit = new THREE.Vector3();
+
+  function spring(s, target, dt, k = 170, c = 19) {
+    const a = k * (target - s.x) - c * s.v;
+    s.v += a * dt; s.x += s.v * dt;
+  }
+
+  resize();
+  addEventListener("resize", resize);
+
+  function frame() {
+    const dt = Math.min(clock.getDelta(), 1 / 30);
+    const t = clock.elapsedTime;
+    modeT += dt;
+
+    // ---- global tilt (0.3 s exponential smoothing)
+    const active = pointer.inside && (mode === "idle");
+    const tgtY = active ? THREE.MathUtils.degToRad(pointer.nx * 7 - 1.2) : THREE.MathUtils.degToRad(-1.2);
+    const tgtX = active ? THREE.MathUtils.degToRad(-pointer.ny * 5.5 + 0.8) : THREE.MathUtils.degToRad(0.8);
+    const kS = 1 - Math.exp(-dt / 0.3);
+    tilt.y += (tgtY - tilt.y) * kS; tilt.x += (tgtX - tilt.x) * kS;
+    slab.rotation.set(tilt.x, tilt.y, 0);
+    slab.updateMatrixWorld(true);
+
+    // ---- pointer on the slab plane
+    ndc.set(pointer.nx, pointer.ny);
+    raycaster.setFromCamera(ndc, camera);
+    slabNormal.set(0, 0, 1).applyQuaternion(slab.quaternion);
+    slabPoint.set(0, 0, L.front).applyMatrix4(slab.matrixWorld);
+    plane.setFromNormalAndCoplanarPoint(slabNormal, slabPoint);
+    const onPlane = raycaster.ray.intersectPlane(plane, hit);
+    if (onPlane) {
+      glow.uPointer.value.copy(hit);
+      localHit.copy(hit); slab.worldToLocal(localHit);
+      const pp = fromSlab(localHit.x, localHit.y);
+      patPointer.tx = pp.u; patPointer.ty = pp.v;
+    }
+    if (!pointer.inside) { patPointer.tx = -9; patPointer.ty = -9; }
+    const kp = 1 - Math.exp(-dt / 0.25);
+    if (patPointer.x < -5 && patPointer.tx > -5) { patPointer.x = patPointer.tx; patPointer.y = patPointer.ty; }
+    patPointer.x += (patPointer.tx - patPointer.x) * kp; patPointer.y += (patPointer.ty - patPointer.y) * kp;
+    glow.uGlow.value += ((active ? 1 : 0) - glow.uGlow.value) * (1 - Math.exp(-dt / 0.25));
+
+    // ---- live cut pattern (~45 Hz)
+    if (t - lastRebuild > 1 / 45) { rebuild(t); lastRebuild = t; }
+
+    // ---- hover pick
+    hoveredId = null;
+    if (active) {
+      const hits = raycaster.intersectObjects(pieces.map((p) => p.glass), false);
+      if (hits.length) hoveredId = hits[0].object.userData.piece;
+    }
+
+    // ---- shatter / reassemble progress per piece
+    let allOut = true, allIn = true;
+    pieces.forEach((pc, i) => {
+      if (mode === "out") {
+        const tt = clamp((modeT - i * 0.025) / 0.72, 0, 1);
+        pc.fly.e = easeInCubic(tt);
+      } else if (mode === "in" || mode === "intro") {
+        const delay = (mode === "intro" ? 0.15 : 0.1) + i * 0.03;
+        const tt = clamp((modeT - delay) / 0.72, 0, 1);
+        pc.fly.e = 1 - easeOutBack(tt);
+      }
+      if (pc.fly.e < 0.999) allOut = false;
+      if (Math.abs(pc.fly.e) > 0.001 || modeT < 0.1 + i * 0.03 + 0.72) allIn = false;
+    });
+    if (mode === "out" && allOut && modeT > 0.9) { mode = "defs"; }
+    if ((mode === "in" || mode === "intro") && allIn) { mode = "idle"; pieces.forEach((p) => (p.fly.e = 0)); setLayerVisible(true); }
+
+    // ---- per piece transform
+    for (const pc of pieces) {
+      const isHover = hoveredId === pc.id;
+      let tipX = 0, tipY = 0;
+      if (isHover && onPlane) {
+        const dxn = clamp((localHit.x - pc.centroid.x) / pc.half.x, -1, 1);
+        const dyn = clamp((localHit.y - pc.centroid.y) / pc.half.y, -1, 1);
+        tipY = 0.24 * dxn; tipX = -0.24 * dyn;
+        const m = Math.hypot(tipX, tipY); if (m > 0.24) { tipX *= 0.24 / m; tipY *= 0.24 / m; }
+      }
+      spring(pc.lift, isHover ? (pc.isNav ? 32 : 50) * L.S : 0, dt);
+      spring(pc.tx, tipX, dt); spring(pc.ty, tipY, dt);
+      const h = clamp(pc.lift.x / ((pc.isNav ? 32 : 50) * L.S), 0, 1.2);
+      pc.mat.iridescence = 0.55 + 0.45 * h;
+      pc.mat.envMapIntensity = 1 + 0.9 * h;
+
+      // ballistic flight
+      const e = pc.fly.e, tau = e * 1.55, S = L.S;
+      const dir = new THREE.Vector2(pc.centroid.x, pc.centroid.y);
+      if (dir.lengthSq() < 1) dir.set(0, -1); dir.normalize();
+      const vx = dir.x * pc.fly.out * S, vy = dir.y * pc.fly.out * S - pc.fly.down * S, vz = pc.fly.vz * S;
+      const gy = -1500 * S;
+      pc.group.position.set(
+        pc.centroid.x + vx * tau,
+        pc.centroid.y + vy * tau + 0.5 * gy * tau * tau,
+        pc.lift.x + vz * tau,
+      );
+      eul.set(pc.tx.x, pc.ty.x, 0); qTip.setFromEuler(eul);
+      qFly.setFromAxisAngle(pc.fly.axis, e * pc.fly.spin);
+      pc.group.quaternion.copy(qFly).multiply(qTip);
+      pc.group.visible = e < 0.999;
+    }
+
+    // ---- definitions view + back sliver
+    let defsOpacity = parseFloat(defs.style.opacity || 0);
+    if (mode === "out" || mode === "defs") {
+      defsOpacity = clamp((modeT - 0.28) / 0.4, 0, 1);
+      if (defsOpacity > 0.5) defs.classList.add("on");
+      sliver.scale = easeOutBack(clamp((modeT - 0.3) / 0.55, 0, 1));
+    } else if (mode === "in") {
+      defsOpacity = Math.min(defsOpacity, 1 - clamp(modeT / 0.25, 0, 1));
+      sliver.scale = 1 - easeOutCubic(clamp(modeT / 0.3, 0, 1));
+    } else { defsOpacity = 0; sliver.scale = 0; }
+    defs.style.opacity = defsOpacity;
+
+    sliver.group.visible = sliver.scale > 0.001;
+    if (sliver.group.visible) {
+      let sHover = false;
+      if (sliver.mesh) {
+        sHover = sliver.hoverDom || raycaster.intersectObject(sliver.mesh, false).length > 0;
+      }
+      const sx = sliver.group.position.x, sy = sliver.group.position.y;
+      const wx = pointer.nx * W / 2, wy = pointer.ny * H / 2;
+      const ty = sHover ? clamp((wx - sx) / (0.07 * W), -1, 1) * 0.14 : 0;
+      const tx = sHover ? -clamp((wy - sy) / (0.05 * H), -1, 1) * 0.14 : 0;
+      spring(sliver.tx, tx, dt); spring(sliver.ty, ty, dt);
+      sliver.group.rotation.set(
+        0.08 + 0.035 * Math.sin(t * 6.283 * 0.9) + sliver.tx.x,
+        -0.16 + 0.03 * Math.sin(t * 6.283 * 1.1 + 1.3) + sliver.ty.x,
+        0,
+      );
+      sliver.group.scale.setScalar(Math.max(0.001, sliver.scale));
+    }
+
+    renderer.render(scene, camera);
+    if (mode === "idle") mapLayers();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // reduced-motion changes at runtime → static
+  matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (e) => { if (e.matches) location.reload(); });
+  hooks.shatter = shatter;
+  window.__facet = { get mode() { return mode; }, shatter, goBack };
+}
+</script>
+</body>
+</html>
