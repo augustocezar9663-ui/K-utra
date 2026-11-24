@@ -32,8 +32,8 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
   address_zip: null,
   latitude: null,
   longitude: null,
-  phone: null,
-  whatsapp: null,
+  phone: "6996081567", // (69) 9608-1567
+  whatsapp: "6996081567",
   email: null,
   instagram: null,
   facebook: null,

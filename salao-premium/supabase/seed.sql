@@ -4,15 +4,21 @@
 --  Nenhum depoimento, profissional ou número de clientes é criado aqui.
 -- =====================================================================
 
-insert into public.business_settings (id, name, tagline, description, cancellation_policy)
+-- Telefone e WhatsApp do salão: (69) 9608-1567 (somente dígitos, com DDD).
+insert into public.business_settings (id, name, tagline, description, cancellation_policy, phone, whatsapp)
 values (
   1,
   'Atelier Aurea',
   'Hair Atelier',
   'Cada detalhe importa. Nosso propósito é proporcionar uma experiência única, unindo técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente.',
-  'Cancelamentos e reagendamentos podem ser solicitados com até 24 horas de antecedência pelo WhatsApp. Atrasos superiores a 15 minutos podem exigir reagendamento.'
+  'Cancelamentos e reagendamentos podem ser solicitados com até 24 horas de antecedência pelo WhatsApp. Atrasos superiores a 15 minutos podem exigir reagendamento.',
+  '6996081567',
+  '6996081567'
 )
-on conflict (id) do nothing;
+on conflict (id) do update
+  -- se as configurações já existirem, só preenche telefone/WhatsApp vazios
+  set phone    = coalesce(public.business_settings.phone, excluded.phone),
+      whatsapp = coalesce(public.business_settings.whatsapp, excluded.whatsapp);
 
 -- Horário de funcionamento do salão (professional_id NULL).
 -- Exemplo: terça a sábado, 09:00–19:00. Ajuste em /admin/configuracoes.
