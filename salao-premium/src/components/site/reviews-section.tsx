@@ -10,7 +10,7 @@ const fmt = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric", t
 export function ReviewsSection({ reviews }: { reviews: Review[] }) {
   if (reviews.length === 0) return null;
   return (
-    <section id="depoimentos" aria-labelledby="depoimentos-titulo" className="bg-cream py-24 md:py-36">
+    <section id="depoimentos" aria-labelledby="depoimentos-titulo" data-tone="#f7f5f2" className="py-24 md:py-36">
       <div className="container-luxe">
         <div id="depoimentos-titulo">
           <SectionHeading

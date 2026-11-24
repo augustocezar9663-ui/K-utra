@@ -27,7 +27,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
   const schedule = summarizeHours(hours);
 
   return (
-    <section id="contato" aria-labelledby="contato-titulo" className="bg-white py-24 md:py-36">
+    <section id="contato" aria-labelledby="contato-titulo" data-tone="#ffffff" className="py-24 md:py-36">
       <div className="container-luxe">
         <div id="contato-titulo">
           <SectionHeading

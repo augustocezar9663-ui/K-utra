@@ -48,7 +48,7 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
   }, [active, close, go]);
 
   return (
-    <section id="galeria" aria-labelledby="galeria-titulo" className="bg-white py-24 md:py-36">
+    <section id="galeria" aria-labelledby="galeria-titulo" data-tone="#ffffff" className="py-24 md:py-36">
       <div className="container-luxe">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>

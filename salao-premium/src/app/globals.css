@@ -180,6 +180,28 @@
   }
 }
 
+/* ---------- Rolagem contínua (Lenis) ---------- */
+html.lenis, html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+body { transition: background-color 0.2s linear; }
+
+/* ---------- Texto real sobre a hero de vidro ---------- */
+.glass-text { z-index: 2; }
+.glass-text * { position: absolute; white-space: pre; color: transparent; margin: 0; }
+.glass-text h1 { position: static; font-size: inherit; }
+.glass-text ::selection { background: rgb(214 193 163 / 0.45); color: transparent; }
+.glass-text .glass-hit { display: block; }
+.glass-text a:focus-visible { outline: 1.5px solid var(--color-champagne); outline-offset: 4px; }
+
+/* ---------- Cursor refinado (somente ponteiro fino) ---------- */
+html.has-luxe-cursor, html.has-luxe-cursor * { cursor: none; }
+html.has-luxe-cursor input, html.has-luxe-cursor textarea, html.has-luxe-cursor select,
+html.has-luxe-cursor [contenteditable] { cursor: text; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

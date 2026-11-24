@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { useLenis } from "@/components/motion/smooth-scroll";
 import { NAV_LINKS } from "@/lib/nav";
 import { Brand } from "./brand";
 
@@ -12,34 +13,66 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
   const pathname = usePathname();
   const overHero = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
+  const [dark, setDark] = useState(overHero);
+  const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
+  const lenis = useLenis();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    let last = window.scrollY;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      // some ao descer, volta ao subir (rolagem contínua sem distração)
+      if (Math.abs(y - last) > 6) {
+        setHidden(y > last && y > 160);
+        last = y;
+      }
+      // tom da seção sob o header (vidro claro ou escuro)
+      const probe = 40;
+      const sec = [...document.querySelectorAll<HTMLElement>("[data-tone]")].find((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top <= probe && r.bottom > probe;
+      });
+      if (sec) {
+        const h = sec.dataset.tone!.replace("#", "");
+        const n = parseInt(h, 16);
+        const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+        setDark(lum < 0.45);
+      } else setDark(false);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    if (open) lenis?.stop(); else lenis?.start();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
     };
-  }, [open]);
+  }, [open, lenis]);
 
   const solid = scrolled || !overHero;
-  const light = !solid && !open;
+  const light = (!solid || dark) && !open;
 
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-700 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          hidden && !open ? "-translate-y-full" : "translate-y-0"
+        } ${
           solid && !open
-            ? "bg-white/75 shadow-[0_1px_0_rgba(17,17,17,0.06)] backdrop-blur-xl backdrop-saturate-150"
+            ? dark
+              ? "bg-[#0d0c0b]/55 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150"
+              : "bg-white/75 shadow-[0_1px_0_rgba(17,17,17,0.06)] backdrop-blur-xl backdrop-saturate-150"
             : "bg-transparent"
         }`}
       >

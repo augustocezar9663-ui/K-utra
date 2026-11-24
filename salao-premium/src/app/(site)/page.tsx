@@ -2,7 +2,8 @@ import { AboutSection } from "@/components/site/about-section";
 import { ContactSection } from "@/components/site/contact-section";
 import { CtaBand } from "@/components/site/cta-band";
 import { GallerySection } from "@/components/site/gallery-section";
-import { Hero } from "@/components/site/hero";
+import { GlassHero } from "@/components/site/glass-hero/glass-hero";
+import { VelocityMarquee } from "@/components/motion/velocity-marquee";
 import { ReviewsSection } from "@/components/site/reviews-section";
 import { ServicesSection } from "@/components/site/services-section";
 import { TeamSection } from "@/components/site/team-section";
@@ -33,9 +34,15 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString(hairSalonJsonLd(settings, hours, services)) }}
       />
-      <Hero imageUrl={settings.hero_image_url} name={settings.name} city={settings.address_city} />
+      <GlassHero imageUrl={settings.hero_image_url} name={settings.name} city={settings.address_city} />
       <ServicesSection services={services} />
       <AboutSection imageUrl={settings.about_image_url} name={settings.name} />
+      <section aria-label="Especialidades" data-tone="#ffffff" className="py-10 md:py-16">
+        <VelocityMarquee
+          items={services.length ? services.map((s) => s.name) : ["Corte", "Coloração", "Mechas", "Tratamentos", "Penteados"]}
+          className="font-serif text-[clamp(3.2rem,9vw,8.5rem)] font-light leading-none text-ink"
+        />
+      </section>
       <GallerySection images={gallery} instagramUrl={instagramLink(settings.instagram)} />
       <TeamSection professionals={professionals} />
       <ReviewsSection reviews={reviews} />

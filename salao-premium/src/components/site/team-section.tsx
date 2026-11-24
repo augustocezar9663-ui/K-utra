@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ExpandPanel } from "@/components/motion/expand-panel";
+import { ParallaxFrame } from "@/components/motion/parallax-media";
 import { Media } from "@/components/ui/media";
 import { Reveal } from "@/components/ui/reveal";
 import type { ProfessionalWithServices } from "@/lib/types";
@@ -6,7 +8,7 @@ import { SectionHeading } from "./section-heading";
 
 export function TeamSection({ professionals }: { professionals: ProfessionalWithServices[] }) {
   return (
-    <section id="profissionais" aria-labelledby="equipe-titulo" className="bg-ink py-24 text-white md:py-36">
+    <ExpandPanel id="profissionais" aria-labelledby="equipe-titulo" data-tone="#111111" className="bg-ink py-24 text-white md:py-36">
       <div className="container-luxe">
         <div id="equipe-titulo">
           <SectionHeading
@@ -27,15 +29,17 @@ export function TeamSection({ professionals }: { professionals: ProfessionalWith
             {professionals.map((p, i) => (
               <Reveal as="li" key={p.id} delay={(i % 4) * 0.08}>
                 <article className="group">
-                  <Media
-                    src={p.photo_url}
-                    alt={`Foto de ${p.name}`}
-                    seed={p.slug}
-                    tone={i % 2 ? "champagne" : "sand"}
-                    sizes="(min-width: 1024px) 23vw, (min-width: 640px) 45vw, 92vw"
-                    className="aspect-[3/4]"
-                    imgClassName="grayscale-[35%] transition-[transform,filter] duration-[1.4s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] group-hover:grayscale-0"
-                  />
+                  <ParallaxFrame className="aspect-[3/4]" strength={7}>
+                    <Media
+                      src={p.photo_url}
+                      alt={`Foto de ${p.name}`}
+                      seed={p.slug}
+                      tone={i % 2 ? "champagne" : "sand"}
+                      sizes="(min-width: 1024px) 23vw, (min-width: 640px) 45vw, 92vw"
+                      className="h-full w-full"
+                      imgClassName="grayscale-[35%] transition-[transform,filter] duration-[1.4s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] group-hover:grayscale-0"
+                    />
+                  </ParallaxFrame>
                   <div className="pt-6">
                     {p.specialty ? <p className="eyebrow text-champagne">{p.specialty}</p> : null}
                     <h3 className="mt-2 text-3xl">{p.name}</h3>
@@ -53,6 +57,6 @@ export function TeamSection({ professionals }: { professionals: ProfessionalWith
           </ul>
         )}
       </div>
-    </section>
+    </ExpandPanel>
   );
 }
