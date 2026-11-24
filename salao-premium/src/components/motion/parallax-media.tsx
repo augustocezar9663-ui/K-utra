@@ -24,6 +24,10 @@ export function ParallaxFrame({
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : [`-${strength}%`, `${strength}%`]);
+  // sobra acima/abaixo suficiente para o deslocamento: o y (em % da camada,
+  // que mede 1 + 2·bleed da moldura) nunca pode passar do bleed
+  const s = Math.min(Math.abs(strength), 30) / 100;
+  const bleed = Math.max(12, Math.ceil((s / (1 - 2 * s)) * 100) + 1);
   const hidden = from === "left" ? "inset(0 100% 0 0)" : from === "right" ? "inset(0 0 0 100%)" : "inset(100% 0 0 0)";
   return (
     <motion.div
@@ -34,7 +38,7 @@ export function ParallaxFrame({
       viewport={{ once: true, margin: "0px 0px -12% 0px" }}
       transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
     >
-      <motion.div className="absolute inset-[-12%_0]" style={{ y }}>
+      <motion.div className="absolute inset-x-0" style={{ y, top: `-${bleed}%`, bottom: `-${bleed}%` }}>
         <motion.div
           className="h-full w-full"
           initial={reveal && !reduce ? { scale: 1.18 } : false}

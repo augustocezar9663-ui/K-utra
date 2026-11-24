@@ -119,6 +119,7 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor(0x000000, 0);
 
+  let disposed = false;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 1, 20000);
   const pmrem = new THREE.PMREMGenerator(renderer);
@@ -461,7 +462,7 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     }
     wake();
   }
-  const ro = new ResizeObserver(() => resize());
+  const ro = new ResizeObserver(() => { if (!disposed) resize(); });
   ro.observe(canvas);
 
   /* ------------------------------ pointer ----------------------------- */
@@ -624,7 +625,7 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     if (idleFrames < 3) schedule();
     else running = false;
   }
-  function schedule() { if (!raf) raf = requestAnimationFrame(frame); running = true; }
+  function schedule() { if (disposed) return; if (!raf) raf = requestAnimationFrame(frame); running = true; }
   function wake() { if (!running) { clock.getDelta(); schedule(); } }
 
   // fontes antes do primeiro desenho
@@ -633,7 +634,7 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     document.fonts.load(`italic 400 64px ${fonts.serif}`),
     document.fonts.load(`600 14px ${fonts.sans}`),
     document.fonts.load(`400 14px ${fonts.sans}`),
-  ]).catch(() => {}).finally(() => { resize(); schedule(); });
+  ]).catch(() => {}).finally(() => { if (disposed) return; resize(); schedule(); });
 
   return {
     setScroll(p: number) {
@@ -648,7 +649,9 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
       wake();
     },
     dispose() {
+      disposed = true;
       cancelAnimationFrame(raf);
+      raf = 0; running = false;
       ro.disconnect(); io.disconnect();
       removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("pointerleave", onLeave);

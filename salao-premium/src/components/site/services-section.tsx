@@ -47,11 +47,23 @@ export function ServicesSection({ services }: { services: Service[] }) {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
   const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.35 });
   const x = useTransform(smooth, [0, 1], [0, -distance]);
-  const imgX = useTransform(smooth, [0, 1], ["-7%", "7%"]);
+  const imgX = useTransform(smooth, [0, 1], ["-6.5%", "6.5%"]);
   const bar = useTransform(smooth, [0, 1], [0.06, 1]);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setIndex(Math.min(services.length, Math.max(1, Math.round(v * (services.length - 1)) + 1)));
   });
+
+  // teclado: o foco num card fora da tela rola a página até a posição da
+  // trilha em que ele aparece (overflow-clip impede o navegador de deslocar
+  // o contêiner por conta própria e dessincronizar a trilha)
+  const onTrackFocus = (e: React.FocusEvent<HTMLUListElement>) => {
+    const section = sectionRef.current, track = trackRef.current;
+    const li = (e.target as HTMLElement).closest("li");
+    if (!section || !track || !li || distance <= 0) return;
+    const want = Math.min(distance, Math.max(0, li.offsetLeft - innerWidth * 0.3));
+    const top = section.getBoundingClientRect().top + scrollY;
+    window.scrollTo({ top: top + want, behavior: "instant" as ScrollBehavior });
+  };
 
   const heading = (
     <div className={pinned ? "flex w-[min(34vw,520px)] shrink-0 flex-col justify-center pr-10" : ""}>
@@ -86,7 +98,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
 
   if (services.length === 0) {
     return (
-      <section id="servicos" data-tone="#f7f5f2" className="py-24 md:py-36">
+      <section id="servicos" ref={sectionRef} data-tone="#f7f5f2" className="py-24 md:py-36">
         <div className="container-luxe">
           {heading}
           <p className="mt-16 border-t border-line pt-10 text-stone">
@@ -106,11 +118,12 @@ export function ServicesSection({ services }: { services: Service[] }) {
       className={`relative z-10 -mt-[25svh] motion-reduce:mt-0 ${pinned ? "lg:-mt-[55svh]" : "py-24 md:py-36"}`}
       style={pinned ? { height: `calc(100svh + ${distance}px)` } : undefined}
     >
-      <div className={pinned ? "sticky top-0 flex h-[100svh] items-center overflow-hidden" : "container-luxe"}>
+      <div className={pinned ? "sticky top-0 flex h-[100svh] items-center overflow-clip" : "container-luxe"}>
         {!pinned ? heading : null}
         <motion.ul
           ref={trackRef}
           style={pinned ? { x } : undefined}
+          onFocus={pinned ? onTrackFocus : undefined}
           className={
             pinned
               ? "flex items-center gap-7 pl-[max(1.25rem,calc((100vw-1320px)/2+2.5rem))] pr-[8vw] will-change-transform"

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLenis } from "@/components/motion/smooth-scroll";
 import { Reveal, RevealLines } from "@/components/ui/reveal";
 import type { GalleryImage } from "@/lib/types";
 
@@ -26,6 +27,7 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
   const [active, setActive] = useState<number | null>(null);
   const visible = filter ? images.filter((i) => i.category === filter) : images;
 
+  const lenis = useLenis();
   const close = useCallback(() => setActive(null), []);
   const go = useCallback(
     (dir: 1 | -1) => setActive((i) => (i === null ? i : (i + dir + visible.length) % visible.length)),
@@ -40,12 +42,15 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
       if (e.key === "ArrowLeft") go(-1);
     };
     document.body.style.overflow = "hidden";
+    // o Lenis rola a página via JS e ignora o overflow do body
+    lenis?.stop();
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      lenis?.start();
       window.removeEventListener("keydown", onKey);
     };
-  }, [active, close, go]);
+  }, [active, close, go, lenis]);
 
   return (
     <section id="galeria" aria-labelledby="galeria-titulo" data-tone="#ffffff" className="py-24 md:py-36">

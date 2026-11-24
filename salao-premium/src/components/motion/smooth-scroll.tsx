@@ -47,24 +47,48 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       if (!a || !href || a.target === "_blank") return;
       const hash = href.startsWith("#") ? href : href.startsWith("/#") && pathRef.current === "/" ? href.slice(1) : null;
       if (!hash) return;
-      const target = hash === "#" ? null : document.querySelector(hash);
-      if (hash !== "#" && !target) return;
+      let target: HTMLElement | null = null;
+      if (hash !== "#") {
+        try {
+          target = document.getElementById(decodeURIComponent(hash.slice(1)));
+        } catch {
+          target = null;
+        }
+        if (!target) return;
+      }
+      // fase de captura: roda antes do onClick do <Link> do Next, que
+      // desistiria da navegação ao ver o preventDefault
       e.preventDefault();
-      l.scrollTo((target as HTMLElement) ?? 0, { offset: hash === "#inicio" ? 0 : -72, duration: 1.6 });
-      history.replaceState(null, "", hash === "#" ? location.pathname : hash);
+      // o menu móvel para o Lenis; ele fecha neste mesmo clique
+      l.start();
+      l.scrollTo(target ?? 0, { offset: hash === "#inicio" ? 0 : -72, duration: 1.6, force: true });
+      history.replaceState(history.state, "", hash === "#" ? location.pathname : hash);
     };
-    document.addEventListener("click", onClick);
+    document.addEventListener("click", onClick, true);
     return () => {
-      document.removeEventListener("click", onClick);
+      document.removeEventListener("click", onClick, true);
       cancelAnimationFrame(raf);
       l.destroy();
       setCurrent(null);
     };
   }, []);
 
-  // nova rota começa do topo
+  // voltar/avançar no histórico: o navegador/Next restauram a posição
+  const popRef = useRef(-Infinity);
   useEffect(() => {
-    if (!location.hash) lenis?.scrollTo(0, { immediate: true });
+    const onPop = () => { popRef.current = performance.now(); };
+    addEventListener("popstate", onPop);
+    return () => removeEventListener("popstate", onPop);
+  }, []);
+
+  // nova rota (navegação para frente) começa do topo — não no primeiro
+  // carregamento, para não desfazer a restauração de rolagem do reload
+  const lastPath = useRef(pathname);
+  useEffect(() => {
+    if (lastPath.current === pathname) return;
+    lastPath.current = pathname;
+    const fromHistory = performance.now() - popRef.current < 1500;
+    if (!fromHistory && !location.hash) lenis?.scrollTo(0, { immediate: true, force: true });
   }, [pathname, lenis]);
 
   return <>{children}</>;

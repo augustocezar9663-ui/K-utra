@@ -27,7 +27,8 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
       setScrolled(y > 24);
       // some ao descer, volta ao subir (rolagem contínua sem distração)
       if (Math.abs(y - last) > 6) {
-        setHidden(y > last && y > 160);
+        const focusInside = document.activeElement?.closest("header") != null;
+        setHidden(y > last && y > 160 && !focusInside);
         last = y;
       }
       // tom da seção sob o header (vidro claro ou escuro)
@@ -66,6 +67,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
   return (
     <>
       <header
+        onFocus={() => setHidden(false)}
         className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           hidden && !open ? "-translate-y-full" : "translate-y-0"
         } ${
