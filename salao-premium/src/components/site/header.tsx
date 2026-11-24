@@ -6,6 +6,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useLenis } from "@/components/motion/smooth-scroll";
 import { NAV_LINKS } from "@/lib/nav";
+import { DUR, EASE_DRAWER, EASE_OUT } from "@/lib/motion";
+import { useHeaderDark } from "@/lib/tone-store";
 import { Brand } from "./brand";
 
 
@@ -13,7 +15,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
   const pathname = usePathname();
   const overHero = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
-  const [dark, setDark] = useState(overHero);
+  const dark = useHeaderDark(overHero);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const lenis = useLenis();
@@ -21,6 +23,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
   useEffect(() => {
     let last = window.scrollY;
     let raf = 0;
+    // só lê scrollY (sem leituras de layout); o tom sob o header vem do ScrollTone
     const update = () => {
       raf = 0;
       const y = window.scrollY;
@@ -31,18 +34,6 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
         setHidden(y > last && y > 160 && !focusInside);
         last = y;
       }
-      // tom da seção sob o header (vidro claro ou escuro)
-      const probe = 40;
-      const sec = [...document.querySelectorAll<HTMLElement>("[data-tone]")].find((el) => {
-        const r = el.getBoundingClientRect();
-        return r.top <= probe && r.bottom > probe;
-      });
-      if (sec) {
-        const h = sec.dataset.tone!.replace("#", "");
-        const n = parseInt(h, 16);
-        const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
-        setDark(lum < 0.45);
-      } else setDark(false);
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();
@@ -68,20 +59,18 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
     <>
       <header
         onFocus={() => setHidden(false)}
-        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,transform] duration-[420ms] ease-out ${
           hidden && !open ? "-translate-y-full" : "translate-y-0"
         } ${
           solid && !open
             ? dark
-              ? "bg-[#05070c]/55 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150"
-              : "bg-white/75 shadow-[0_1px_0_rgba(17,17,17,0.06)] backdrop-blur-xl backdrop-saturate-150"
+              ? "bg-[#05070c]/70 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+              : "bg-white/80 shadow-[0_1px_0_rgba(17,17,17,0.06)] backdrop-blur-md"
             : "bg-transparent"
         }`}
       >
         <div
-          className={`container-luxe flex items-center justify-between transition-[height] duration-700 ${
-            solid ? "h-[72px]" : "h-[88px]"
-          }`}
+          className="container-luxe flex h-[76px] items-center justify-between md:h-[84px]"
         >
           <Link href="/" aria-label={`${name} — página inicial`} className="relative z-10" onClick={() => setOpen(false)}>
             <Brand name={name} tagline={tagline} logoUrl={logoUrl} light={light} />
@@ -93,7 +82,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className={`link-underline pb-1 text-[0.7rem] font-semibold uppercase tracking-[0.22em] transition-colors duration-500 ${
+                    className={`link-underline pb-1 text-[0.7rem] font-semibold uppercase tracking-[0.22em] transition-colors duration-200 ${
                       light ? "text-white/85 hover:text-white" : "text-ink/75 hover:text-ink"
                     }`}
                   >
@@ -121,12 +110,12 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
             >
               <span className="relative block h-3 w-7">
                 <span
-                  className={`absolute left-0 top-0 h-px w-full transition-all duration-500 ${
+                  className={`absolute left-0 top-0 h-px w-full transition-[top,transform,background-color] duration-300 ease-out ${
                     light ? "bg-white" : "bg-ink"
                   } ${open ? "top-1.5 rotate-45" : ""}`}
                 />
                 <span
-                  className={`absolute bottom-0 left-0 h-px transition-all duration-500 ${light ? "bg-white" : "bg-ink"} ${
+                  className={`absolute bottom-0 left-0 h-px transition-[bottom,width,transform,background-color] duration-300 ease-out ${light ? "bg-white" : "bg-ink"} ${
                     open ? "bottom-1.5 w-full -rotate-45" : "w-2/3"
                   }`}
                 />
@@ -147,7 +136,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             exit={{ clipPath: "inset(0 0 100% 0)" }}
-            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+            transition={{ duration: DUR.drawer, ease: EASE_DRAWER }}
           >
             <nav aria-label="Menu móvel" className="container-luxe flex flex-1 flex-col justify-center pt-24">
               <ul className="space-y-2">
@@ -156,14 +145,13 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
                     <motion.div
                       initial={{ y: "100%" }}
                       animate={{ y: "0%" }}
-                      transition={{ duration: 0.8, delay: 0.25 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.5, delay: 0.12 + i * 0.04, ease: EASE_OUT }}
                     >
                       <Link
                         href={l.href}
                         onClick={() => setOpen(false)}
-                        className="flex items-baseline gap-4 py-2 font-serif text-[2.6rem] leading-tight text-ink"
+                        className="block py-2 font-serif text-[2.6rem] leading-tight text-ink"
                       >
-                        <span className="eyebrow text-accent-deep">0{i + 1}</span>
                         {l.label}
                       </Link>
                     </motion.div>
@@ -175,7 +163,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
               className="container-luxe pb-10"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
+              transition={{ delay: 0.35, duration: 0.4, ease: EASE_OUT }}
             >
               <Link href="/agendar" onClick={() => setOpen(false)} className="btn btn-primary w-full">
                 Agendar horário

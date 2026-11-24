@@ -8,13 +8,17 @@
   --color-sand: #dde5f3;
   --color-accent: #5b8cff;
   --color-accent-deep: #1f4fd6;
-  --color-stone: #687083;
+  --color-stone: #566074; /* AA (≥ 4.5:1) sobre branco, azul gelo e areia */
   --color-line: #dde3ee;
 
   --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   --font-sans: var(--font-manrope), "Manrope", system-ui, sans-serif;
 
-  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Curvas fortes (Emil Kowalski): entradas/saídas, movimento em tela, gavetas */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-luxe: cubic-bezier(0.23, 1, 0.32, 1);
   --tracking-label: 0.28em;
 
   --animate-shimmer: shimmer 1.8s linear infinite;
@@ -77,6 +81,14 @@
     text-transform: uppercase;
   }
 
+  /* Rótulo discreto em caixa normal (dt, colunas, metadados) */
+  .label {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+  }
+
   /* Botões */
   .btn {
     position: relative;
@@ -93,9 +105,12 @@
     white-space: nowrap;
     overflow: hidden;
     isolation: isolate;
-    transition: color 0.5s var(--ease-luxe), background-color 0.5s var(--ease-luxe),
-      border-color 0.5s var(--ease-luxe), opacity 0.3s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease,
+      opacity 0.2s ease, transform 0.16s var(--ease-luxe);
   }
+  .btn:active:not(:disabled) { transform: scale(0.97); }
   .btn::before {
     content: "";
     position: absolute;
@@ -103,9 +118,8 @@
     z-index: -1;
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 0.6s var(--ease-luxe);
+    transition: transform 0.42s var(--ease-luxe);
   }
-  .btn:hover::before { transform: scaleX(1); transform-origin: left; }
   .btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .btn:disabled::before { display: none; }
 
@@ -117,34 +131,40 @@
 
   .btn-light { background: var(--color-paper); color: var(--color-ink); }
   .btn-light::before { background: var(--color-ink); }
-  .btn-light:hover { color: var(--color-paper); }
+
 
   .btn-ghost-light { border: 1px solid rgb(255 255 255 / 0.45); color: var(--color-paper); }
   .btn-ghost-light::before { background: var(--color-paper); }
-  .btn-ghost-light:hover { color: var(--color-ink); border-color: var(--color-paper); }
+
 
   .btn-outline { border: 1px solid var(--color-ink); color: var(--color-ink); }
   .btn-outline::before { background: var(--color-ink); }
-  .btn-outline:hover { color: var(--color-paper); }
+
+  /* Hover apenas em dispositivos com mouse/trackpad (toque gera hovers falsos) */
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover::before { transform: scaleX(1); transform-origin: left; }
+    .btn-light:hover { color: var(--color-paper); }
+    .btn-ghost-light:hover { color: var(--color-ink); border-color: var(--color-paper); }
+    .btn-outline:hover { color: var(--color-paper); }
+    .link-underline:hover { background-size: 100% 1px; }
+  }
 
   .link-underline {
     background-image: linear-gradient(currentColor, currentColor);
     background-size: 0% 1px;
     background-position: 0 100%;
     background-repeat: no-repeat;
-    transition: background-size 0.5s var(--ease-luxe);
+    transition: background-size 0.3s var(--ease-luxe);
   }
-  .link-underline:hover { background-size: 100% 1px; }
+  .link-underline:focus-visible { background-size: 100% 1px; }
 
   /* Campos de formulário */
   .field-label {
     display: block;
     margin-bottom: 0.5rem;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-stone);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink);
   }
   .field {
     width: 100%;
@@ -155,7 +175,7 @@
     border-radius: 0;
     font-size: 1rem;
     color: var(--color-ink);
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .field::placeholder { color: #98a1b3; }
   .field:focus {
@@ -178,8 +198,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.07;
-    mix-blend-mode: overlay;
+    opacity: 0.045;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
 }
@@ -190,8 +209,6 @@ html.lenis { scroll-behavior: auto; }
 .lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
 .lenis [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
-
-body { transition: background-color 0.2s linear; }
 
 /* ---------- Texto real sobre a hero de vidro ---------- */
 .glass-text { z-index: 2; }

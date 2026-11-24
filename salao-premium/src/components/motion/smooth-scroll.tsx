@@ -31,7 +31,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const l = new Lenis({ lerp: 0.085, wheelMultiplier: 0.95, smoothWheel: true, anchors: false });
+    const l = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true, anchors: false });
     let raf = 0;
     const loop = (t: number) => {
       l.raf(t);

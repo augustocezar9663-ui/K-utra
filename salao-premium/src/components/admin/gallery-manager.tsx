@@ -59,7 +59,7 @@ function GalleryForm({ image, onDone }: { image: GalleryImage | null; onDone: ()
       <FieldError state={state} name="image_url" />
       <div>
         <label className="field-label" htmlFor="g-alt">Descrição (acessibilidade)</label>
-        <input id="g-alt" name="alt" defaultValue={image?.alt} maxLength={160} className="field" placeholder="Ex.: mechas loiras em cabelo ondulado" />
+        <input id="g-alt" name="alt" defaultValue={image?.alt} maxLength={160} className="field" placeholder="Ex.: degradê baixo com risca lateral" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

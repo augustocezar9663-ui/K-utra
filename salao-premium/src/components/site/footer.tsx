@@ -17,15 +17,15 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
       <div className="container-luxe grid gap-14 py-20 md:grid-cols-12 md:py-24">
         <div className="md:col-span-4">
           <Brand name={settings.name} tagline={settings.tagline} light />
-          <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/55">
-            Técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente.
+          <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/70">
+            Técnica, cuidado e precisão para valorizar o estilo e a personalidade de cada cliente.
           </p>
           <Link href="/agendar" className="btn btn-accent mt-8">
             Agendar experiência
           </Link>
         </div>
         <nav aria-label="Rodapé" className="md:col-span-2">
-          <p className="eyebrow text-accent">Navegação</p>
+          <p className="font-serif text-xl text-white">Navegação</p>
           <ul className="mt-6 space-y-3 text-sm text-white/70">
             {NAV_LINKS.map((l) => (
               <li key={l.href}>
@@ -37,7 +37,7 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
           </ul>
         </nav>
         <div className="md:col-span-3">
-          <p className="eyebrow text-accent">Contato</p>
+          <p className="font-serif text-xl text-white">Contato</p>
           <ul className="mt-6 space-y-3 text-sm text-white/70">
             {address.hasAddress ? <li>{address.line1}<br />{address.line2}</li> : null}
             {settings.phone ? (
@@ -71,19 +71,19 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
           </ul>
         </div>
         <div className="md:col-span-3">
-          <p className="eyebrow text-accent">Horários</p>
+          <p className="font-serif text-xl text-white">Horários</p>
           <ul className="mt-6 space-y-3 text-sm">
             {schedule.map((g) => (
               <li key={g.label} className="flex justify-between gap-4 border-b border-white/10 pb-3">
-                <span className="text-white/55">{g.label}</span>
-                <span className={g.closed ? "text-white/40" : "text-white/85"}>{g.value}</span>
+                <span className="text-white/70">{g.label}</span>
+                <span className={g.closed ? "text-white/60" : "text-white/85"}>{g.value}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="container-luxe flex flex-col gap-3 py-7 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
+        <div className="container-luxe flex flex-col gap-3 py-7 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>© {settings.name}. Todos os direitos reservados.</p>
           <Link href="/admin" className="link-underline hover:text-white/70">
             Área administrativa

@@ -6,12 +6,13 @@
 
 insert into public.professionals (slug, name, specialty, bio, sort_order) values
   ('profissional-exemplo-1', 'Profissional 1 (exemplo)', 'Corte & Visagismo', 'Perfil de demonstração. Substitua pela apresentação real do profissional.', 1),
-  ('profissional-exemplo-2', 'Profissional 2 (exemplo)', 'Colorimetria',      'Perfil de demonstração. Substitua pela apresentação real do profissional.', 2)
+  ('profissional-exemplo-2', 'Profissional 2 (exemplo)', 'Barba & Navalha',   'Perfil de demonstração. Substitua pela apresentação real do profissional.', 2)
 on conflict (slug) do nothing;
 
--- Ambos realizam todos os serviços ativos
+-- Ambos realizam todos os serviços ativos (rode de novo após criar serviços)
 insert into public.professional_services (professional_id, service_id)
 select p.id, s.id
   from public.professionals p cross join public.services s
  where p.slug like 'profissional-exemplo-%'
+   and s.is_active
 on conflict do nothing;

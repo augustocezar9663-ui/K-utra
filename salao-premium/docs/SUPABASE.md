@@ -14,7 +14,7 @@ No painel do projeto, abra **SQL Editor** → **New query** e execute, **nesta o
 2. `supabase/migrations/0002_booking.sql`
 3. `supabase/migrations/0003_rls.sql`
 4. `supabase/migrations/0004_storage.sql`
-5. `supabase/seed.sql` — configurações iniciais, horário de funcionamento (ter–sáb, 09h–19h) e os 9 serviços com preços de exemplo
+5. `supabase/seed.sql` — configurações iniciais, horário de funcionamento (ter–sáb, 09h–19h) e o catálogo de corte masculino (9 serviços com preços de exemplo: corte, corte + barba, barba, acabamento, coloração, platinado, pigmentação, hidratação e sobrancelha). Se você já tinha rodado uma versão antiga, rodar de novo desativa os exemplos femininos antigos sem tocar no que foi personalizado
 6. *(opcional)* `supabase/demo.sql` — 2 profissionais marcados como "(exemplo)" para testar o agendamento. **Remova-os** em `/admin/profissionais` antes de publicar.
 
 > Alternativa com a CLI: `supabase link --project-ref <ref>` e `supabase db push` (aplica as migrations); depois rode `seed.sql` no SQL Editor.

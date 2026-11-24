@@ -36,7 +36,7 @@ export function WhatsAppFloat({ number, salonName }: { number: string | null; sa
             initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="w-72 origin-bottom-right bg-white p-2 shadow-[0_20px_60px_-20px_rgba(17,17,17,0.35)]"
             role="menu"
           >
@@ -71,7 +71,7 @@ export function WhatsAppFloat({ number, salonName }: { number: string | null; sa
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? "Fechar opções do WhatsApp" : "Falar pelo WhatsApp"}
-        className="group flex h-14 w-14 items-center justify-center rounded-full bg-ink text-white shadow-[0_14px_40px_-12px_rgba(17,17,17,0.6)] transition-transform duration-500 hover:scale-105"
+        className="group flex h-14 w-14 items-center justify-center rounded-full bg-ink text-white shadow-[0_14px_40px_-12px_rgba(17,17,17,0.6)] transition-transform duration-200 ease-out hover:scale-105 active:scale-95"
       >
         {open ? <X className="h-5 w-5" strokeWidth={1.5} /> : <WhatsAppIcon className="h-6 w-6 text-accent" />}
       </button>

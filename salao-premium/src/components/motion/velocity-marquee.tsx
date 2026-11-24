@@ -38,8 +38,8 @@ export function VelocityMarquee({ items, baseVelocity = -2.2, className = "" }: 
     <>
       {items.map((t, i) => (
         <span key={i} className="flex items-center gap-[0.45em] pr-[0.45em]">
-          <span className={i % 2 ? "italic text-accent-deep" : ""}>{t}</span>
-          <span aria-hidden="true" className="inline-block h-[0.12em] w-[0.12em] rotate-45 bg-current opacity-40" />
+          <span>{t}</span>
+          <span aria-hidden="true" className="inline-block h-[0.12em] w-[0.12em] rotate-45 bg-accent-deep" />
         </span>
       ))}
     </>

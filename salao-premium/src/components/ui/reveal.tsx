@@ -1,8 +1,7 @@
 "use client";
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
+import { DUR, EASE_OUT as EASE } from "@/lib/motion";
 
 interface RevealProps {
   children: ReactNode;
@@ -13,7 +12,7 @@ interface RevealProps {
 }
 
 /** Fade-in + slide-up ao entrar na viewport (uma única vez). */
-export function Reveal({ children, delay = 0, y = 28, className, as = "div" }: RevealProps) {
+export function Reveal({ children, delay = 0, y = 20, className, as = "div" }: RevealProps) {
   const reduce = useReducedMotion();
   const Comp = motion[as];
   return (
@@ -22,7 +21,7 @@ export function Reveal({ children, delay = 0, y = 28, className, as = "div" }: R
       initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: reduce ? 0.2 : 1, delay, ease: EASE }}
+      transition={{ duration: reduce ? 0.2 : DUR.reveal, delay, ease: EASE }}
     >
       {children}
     </Comp>
@@ -65,7 +64,7 @@ export function RevealLines({
               show: {
                 y: "0%",
                 opacity: 1,
-                transition: { duration: reduce ? 0.2 : 1.15, delay: delay + i * 0.12, ease: EASE },
+                transition: { duration: reduce ? 0.2 : 0.9, delay: delay + i * 0.07, ease: EASE },
               },
             }}
           >

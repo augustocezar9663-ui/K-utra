@@ -27,14 +27,26 @@ select null, d, time '09:00', time '19:00'
   from generate_series(2, 6) as d
  where not exists (select 1 from public.working_hours where professional_id is null);
 
+-- Catálogo de CORTE MASCULINO (valores iniciais de exemplo — edite em /admin/servicos)
 insert into public.services (slug, name, description, category, duration_minutes, price_cents, price_from, sort_order) values
-  ('corte-feminino',        'Corte Feminino',         'Consultoria de visagismo e corte personalizado, desenhado para o seu formato de rosto, textura e rotina.', 'Corte',       60, 18000, false, 1),
-  ('corte-masculino',       'Corte Masculino',        'Corte preciso com acabamento na tesoura ou máquina, finalizado com produtos de alta performance.',           'Corte',       45, 11000, false, 2),
-  ('escova',                'Escova',                 'Escova modeladora com proteção térmica para um acabamento polido, com movimento e brilho duradouros.',      'Finalização', 45,  9000, true,  3),
-  ('coloracao',             'Coloração',              'Cor sob medida com diagnóstico do fio, pigmentos de alta fixação e cuidado com a integridade capilar.',       'Cor',        120, 32000, true,  4),
-  ('mechas',                'Mechas',                 'Mechas, balayage ou morena iluminada com técnicas de iluminação natural e tonalização personalizada.',      'Cor',        180, 55000, true,  5),
-  ('hidratacao',            'Hidratação',             'Ritual de hidratação profunda que devolve maciez, elasticidade e brilho aos fios.',                         'Tratamento',  60, 15000, false, 6),
-  ('reconstrucao-capilar',  'Reconstrução Capilar',   'Reposição de massa e proteínas para fios fragilizados por química, calor ou agressões do dia a dia.',      'Tratamento',  75, 22000, false, 7),
-  ('tratamento-especializado','Tratamento Especializado','Protocolo desenvolvido após análise do couro cabeludo e da fibra capilar, para necessidades específicas.', 'Tratamento',  90, 28000, true,  8),
-  ('penteados',             'Penteados',              'Penteados para eventos, noivas e ocasiões especiais, com prova e acabamento impecável.',                    'Finalização', 90, 26000, true,  9)
+  ('corte-masculino',     'Corte Masculino',     'Corte sob medida com consultoria de visagismo, na tesoura, máquina ou navalha, com lavagem e finalização.',     'Corte',      45, 11000, false, 1),
+  ('corte-e-barba',       'Corte + Barba',       'O ritual completo: corte personalizado e barba desenhada na navalha, com toalha quente e acabamento com balm.',  'Corte',      75, 17000, false, 2),
+  ('barba',               'Barba',               'Design e aparo da barba com navalha, toalha quente e hidratação, para um contorno preciso e confortável.',      'Barba',      40,  7000, false, 3),
+  ('acabamento',          'Acabamento',          'Manutenção do contorno, da nuca e das laterais entre um corte e outro, para manter o visual alinhado.',          'Corte',      20,  4000, false, 4),
+  ('coloracao-masculina', 'Coloração Masculina', 'Cobertura de fios brancos ou mudança de tom com resultado natural, no cabelo ou na barba.',                    'Cor',        60, 15000, true,  5),
+  ('platinado',           'Platinado',           'Descoloração global com tonalização e cuidado com a integridade dos fios, para um platinado uniforme.',         'Cor',       150, 32000, true,  6),
+  ('pigmentacao',         'Pigmentação',         'Preenchimento de falhas na barba ou no desenho do corte, para um acabamento mais definido e natural.',          'Barba',      30,  6000, false, 7),
+  ('hidratacao',          'Hidratação',          'Tratamento que devolve maciez, brilho e controle aos fios, com massagem relaxante no couro cabeludo.',          'Tratamento', 40,  9000, false, 8),
+  ('sobrancelha',         'Sobrancelha',         'Limpeza e alinhamento discreto da sobrancelha na navalha, com acabamento natural.',                            'Corte',      15,  3500, false, 9)
 on conflict (slug) do nothing;
+
+-- Instalações que já rodaram o seed antigo (catálogo feminino de exemplo):
+-- desativa somente os exemplos que continuam com o nome original — nada
+-- que tenha sido renomeado ou criado no painel é alterado.
+update public.services
+   set is_active = false
+ where (slug, name) in (
+   ('corte-feminino', 'Corte Feminino'), ('escova', 'Escova'), ('mechas', 'Mechas'),
+   ('penteados', 'Penteados'), ('coloracao', 'Coloração'),
+   ('reconstrucao-capilar', 'Reconstrução Capilar'), ('tratamento-especializado', 'Tratamento Especializado')
+ );

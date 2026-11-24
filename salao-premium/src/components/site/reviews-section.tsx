@@ -14,15 +14,13 @@ export function ReviewsSection({ reviews }: { reviews: Review[] }) {
       <div className="container-luxe">
         <div id="depoimentos-titulo">
           <SectionHeading
-            index="05"
-            eyebrow="Depoimentos"
-            lines={["Palavras de quem", <em key="e" className="text-accent-deep">viveu a experiência.</em>]}
+            lines={["Palavras de quem", "viveu a experiência."]}
           />
         </div>
         <ul className="mt-16 grid gap-6 md:mt-20 md:grid-cols-2 lg:grid-cols-3">
           {reviews.map((r, i) => (
             <Reveal as="li" key={r.id} delay={(i % 3) * 0.08}>
-              <figure className="flex h-full flex-col bg-white p-8 transition-transform duration-700 hover:-translate-y-1 md:p-10">
+              <figure className="flex h-full flex-col bg-white p-8 transition-transform duration-300 ease-out hover:-translate-y-1 md:p-10">
                 <div className="flex gap-1" aria-label={`Nota ${r.rating} de 5`} role="img">
                   {Array.from({ length: 5 }, (_, k) => (
                     <Star

@@ -1,6 +1,6 @@
 # Atelier Aurea — Plataforma de agendamento para salão
 
-Site institucional premium + agendamento online + painel administrativo para salão de cabeleireiro.
+Site institucional premium + agendamento online + painel administrativo para salão de corte masculino.
 
 **Stack:** Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Motion · Lucide · Supabase (Postgres, Auth, Storage) · Zod.
 

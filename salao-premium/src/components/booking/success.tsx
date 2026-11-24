@@ -93,7 +93,7 @@ export function BookingSuccess({
       </motion.svg>
 
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.8 }}>
-        <p className="eyebrow mt-8 text-accent-deep">{pending ? "Solicitação registrada" : "Agendamento confirmado"}</p>
+        <p className="label mt-8 text-accent-deep">{pending ? "Solicitação registrada" : "Agendamento confirmado"}</p>
         <h2 className="mt-4 text-[clamp(2.4rem,6vw,3.8rem)] font-light leading-[1.02]">
           {pending ? "Seu horário está reservado." : "Tudo pronto para receber você."}
         </h2>
@@ -106,7 +106,7 @@ export function BookingSuccess({
 
         <div className="mt-10 border border-line bg-white p-6 text-left sm:p-8">
           <div className="flex items-center justify-between border-b border-line pb-5">
-            <span className="eyebrow text-stone">Código do agendamento</span>
+            <span className="label text-stone">Código do agendamento</span>
             <span className="font-serif text-2xl tracking-[0.08em]">{result.code}</span>
           </div>
           <dl className="mt-2 divide-y divide-line text-sm">

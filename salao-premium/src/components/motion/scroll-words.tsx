@@ -4,10 +4,10 @@ import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } f
 import { useRef } from "react";
 
 /** Parágrafo que "acende" palavra por palavra conforme a rolagem avança. */
-export function ScrollWords({ text, className = "", dim = 0.16 }: { text: string; className?: string; dim?: number }) {
+export function ScrollWords({ text, className = "", dim = 0.3 }: { text: string; className?: string; dim?: number }) {
   const ref = useRef<HTMLParagraphElement>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.45"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.9", "end 0.62"] });
   const words = text.split(" ");
   // mesma estrutura no servidor e no cliente (evita erro de hidratação);
   // com movimento reduzido as palavras já aparecem acesas

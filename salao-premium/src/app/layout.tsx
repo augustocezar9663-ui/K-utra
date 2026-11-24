@@ -23,9 +23,9 @@ const manrope = Manrope({
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   const city = s.address_city ? ` em ${s.address_city}` : "";
-  const title = `${s.name} — Salão de beleza${city} · Agendamento online`;
+  const title = `${s.name} — Corte masculino${city} · Agendamento online`;
   const description =
-    "Uma experiência de beleza exclusiva, pensada para valorizar sua personalidade e transformar seu visual. Cortes, coloração, mechas e tratamentos capilares com agendamento online.";
+    "Corte masculino, barba e cuidados capilares com hora marcada. Uma experiência exclusiva, pensada para valorizar sua personalidade e transformar seu visual.";
   return {
     metadataBase: new URL(SITE_URL),
     title: { default: title, template: `%s · ${s.name}` },

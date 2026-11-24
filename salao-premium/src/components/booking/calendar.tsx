@@ -65,7 +65,7 @@ export function Calendar({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="font-serif text-2xl"
             aria-live="polite"
           >
@@ -85,7 +85,7 @@ export function Calendar({
 
       <div className="mt-6 grid grid-cols-7 text-center" aria-hidden="true">
         {WEEKDAY_SHORT.map((d) => (
-          <span key={d} className="eyebrow py-2 text-[0.6rem] text-stone">
+          <span key={d} className="label py-2 text-xs text-stone">
             {d}
           </span>
         ))}
@@ -99,7 +99,7 @@ export function Calendar({
             initial={{ opacity: 0, x: direction * 40 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -40 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
             className="grid grid-cols-7 gap-1"
             role="grid"
             aria-label={`Dias de ${MONTHS[m - 1]}`}
@@ -121,7 +121,7 @@ export function Calendar({
                   aria-selected={isSelected}
                   aria-label={`${day} de ${MONTHS[m - 1]}${available ? `, ${slots} horários disponíveis` : ", indisponível"}`}
                   onClick={() => onSelect(key)}
-                  className={`relative flex aspect-square items-center justify-center text-[0.95rem] transition-all duration-300 ${
+                  className={`relative flex aspect-square items-center justify-center text-[0.95rem] transition-[background-color,color] duration-150 ease ${
                     isSelected
                       ? "bg-ink text-white"
                       : available

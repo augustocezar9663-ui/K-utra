@@ -114,7 +114,12 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
   const { canvas, layer, copy, fonts } = opts;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
   const isCoarse = matchMedia("(pointer: coarse)").matches;
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, isCoarse ? 1.5 : 2));
+  // Resolução adaptativa: começa no máximo e desce em passos de 0,25 se os
+  // quadros ficarem lentos de forma sustentada (volta a subir com folga).
+  const MAX_DPR = Math.min(devicePixelRatio || 1, isCoarse ? 1.5 : 2);
+  const MIN_DPR = Math.min(1, MAX_DPR);
+  let dpr = MAX_DPR;
+  renderer.setPixelRatio(dpr);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor(0x000000, 0);
@@ -503,9 +508,45 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     const d = (y1 - y0 + g * y1) / w, e = (y3 - y0 + hh * y3) / h;
     return `matrix3d(${a},${d},0,${g / w},${b},${e},0,${hh / h},0,0,1,0,${x0},${y0},0,1)`;
   }
+  // escreve estilos só quando mudam (evita recálculo de estilo a cada quadro)
+  let lastTransform = "", lastOpacity = "", lastVisibility = "";
   function mapLayer() {
     const r = L.panel, z = L.front;
-    layer.style.transform = quadToCss(r.w, r.h, screenOf(r.left, r.top, z), screenOf(r.right, r.top, z), screenOf(r.right, r.bottom, z), screenOf(r.left, r.bottom, z));
+    const css = quadToCss(r.w, r.h, screenOf(r.left, r.top, z), screenOf(r.right, r.top, z), screenOf(r.right, r.bottom, z), screenOf(r.left, r.bottom, z));
+    if (css !== lastTransform) { layer.style.transform = css; lastTransform = css; }
+  }
+  function setLayerAlpha(a: number) {
+    const o = a.toFixed(3), v = a > 0.01 ? "visible" : "hidden";
+    if (o !== lastOpacity) { layer.style.opacity = o; lastOpacity = o; }
+    if (v !== lastVisibility) { layer.style.visibility = v; lastVisibility = v; }
+  }
+
+  // medidor de quadros para a resolução adaptativa — por TEMPO acumulado,
+  // para reagir mesmo quando o aparelho é lento a ponto de render poucos
+  // quadros; intervalos longos são limitados (não descartados)
+  let frameEma = 16.7, lastFrameAt = 0, slowTime = 0, fastTime = 0;
+  function applyDpr(next: number) {
+    if (next === dpr) return;
+    dpr = next;
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(W, H, false);
+  }
+  function adaptResolution(now: number) {
+    const raw = lastFrameAt ? now - lastFrameAt : 16.7;
+    lastFrameAt = now;
+    const interval = Math.min(raw, 250);
+    frameEma += (interval - frameEma) * 0.15;
+    if (frameEma > 22) { slowTime += interval; fastTime = 0; }
+    else if (frameEma < 17.5) { fastTime += interval; slowTime = 0; }
+    else { slowTime = 0; fastTime = 0; }
+    if (slowTime > 900 && dpr > MIN_DPR) {
+      // lentidão severa vai direto ao mínimo; moderada desce 0,25
+      applyDpr(frameEma > 50 ? MIN_DPR : Math.max(MIN_DPR, dpr - 0.25));
+      slowTime = 0; frameEma = 16.7;
+    } else if (fastTime > 6000 && dpr < MAX_DPR) {
+      applyDpr(Math.min(MAX_DPR, dpr + 0.25));
+      fastTime = 0;
+    }
   }
 
   /* ------------------------------- loop ------------------------------- */
@@ -524,8 +565,9 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     s.x += s.v * dt;
   }
 
-  function frame() {
+  function frame(now: number) {
     raf = 0;
+    adaptResolution(now);
     const dt = Math.min(clock.getDelta(), 1 / 30);
     const t = clock.elapsedTime;
 
@@ -562,7 +604,9 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     patPointer.x += (patPointer.tx - patPointer.x) * kp; patPointer.y += (patPointer.ty - patPointer.y) * kp;
     glow.uGlow.value += ((interactive ? 1 : 0) - glow.uGlow.value) * (1 - Math.exp(-dt / 0.25));
 
-    if (t - lastRebuild > (reduceLoad ? 1 / 30 : 1 / 45) && !shattered) { rebuild(t); lastRebuild = t; }
+    // "respiração" dos cortes: 30 Hz bastam para um movimento lento e
+    // poupam a criação de geometria (20 Hz em telas de toque)
+    if (t - lastRebuild > (reduceLoad ? 1 / 20 : 1 / 30) && !shattered) { rebuild(t); lastRebuild = t; }
 
     let hovered: string | null = null;
     if (interactive) {
@@ -613,8 +657,7 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
 
     // a camada de texto real só existe enquanto o vidro está montado
     const textAlpha = introDone ? clamp(1 - scrollE * 14, 0, 1) : 0;
-    layer.style.opacity = String(textAlpha);
-    layer.style.visibility = textAlpha > 0.01 ? "visible" : "hidden";
+    setLayerAlpha(textAlpha);
     if (textAlpha > 0) mapLayer();
 
     renderer.render(scene, camera);
@@ -626,7 +669,7 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     else running = false;
   }
   function schedule() { if (disposed) return; if (!raf) raf = requestAnimationFrame(frame); running = true; }
-  function wake() { if (!running) { clock.getDelta(); schedule(); } }
+  function wake() { if (!running) { clock.getDelta(); lastFrameAt = 0; schedule(); } }
 
   // fontes antes do primeiro desenho
   Promise.all([

@@ -21,7 +21,7 @@ export function Brand({
   return (
     <span className="flex flex-col leading-none">
       <span
-        className={`font-serif text-[1.65rem] tracking-[0.02em] transition-colors duration-500 ${
+        className={`font-serif text-[1.65rem] tracking-[0.02em] transition-colors duration-300 ${
           light ? "text-white" : "text-ink"
         }`}
       >
@@ -29,7 +29,7 @@ export function Brand({
       </span>
       {tagline ? (
         <span
-          className={`mt-1 text-[0.56rem] font-semibold uppercase tracking-[0.42em] transition-colors duration-500 ${
+          className={`mt-1 text-[0.56rem] font-semibold uppercase tracking-[0.42em] transition-colors duration-300 ${
             light ? "text-accent" : "text-stone"
           }`}
         >

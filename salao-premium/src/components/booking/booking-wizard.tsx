@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Media } from "@/components/ui/media";
 import { formatDateLong, formatDuration, formatPrice, maskPhone, onlyDigits } from "@/lib/format";
+import { DUR, EASE_OUT as EASE } from "@/lib/motion";
 import { addDaysToKey, dateKeyOf } from "@/lib/time";
 import type { BookingResult, ProfessionalWithServices, Service } from "@/lib/types";
 import { customerSchema } from "@/lib/validation";
@@ -30,7 +31,6 @@ interface SlotDTO {
 }
 
 const STEPS = ["Serviços", "Profissional", "Data", "Horário", "Seus dados", "Confirmação"] as const;
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 type Customer = { name: string; phone: string; whatsapp: string; email: string; notes: string };
 const EMPTY_CUSTOMER: Customer = { name: "", phone: "", whatsapp: "", email: "", notes: "" };
@@ -268,7 +268,7 @@ export function BookingWizard({
   if (!salon.configured) {
     return (
       <div className="mx-auto max-w-xl border border-line bg-white p-10 text-center">
-        <p className="eyebrow text-accent-deep">Em breve</p>
+        <p className="label text-accent-deep">Em breve</p>
         <h2 className="mt-4 text-4xl font-light">Agendamento online em configuração</h2>
         <p className="mt-4 text-stone">
           Enquanto isso, fale com a nossa equipe para reservar o seu horário.
@@ -292,10 +292,12 @@ export function BookingWizard({
     );
   }
 
+  // troca de etapa rápida (interface < 300 ms): a saída é mais curta que a
+  // entrada para não deixar a área em branco entre uma etapa e outra
   const variants = {
-    enter: (d: number) => ({ opacity: 0, x: reduce ? 0 : d * 48 }),
-    center: { opacity: 1, x: 0 },
-    exit: (d: number) => ({ opacity: 0, x: reduce ? 0 : d * -48 }),
+    enter: (d: number) => ({ opacity: 0, x: reduce ? 0 : d * 24 }),
+    center: { opacity: 1, x: 0, transition: { duration: DUR.step, ease: EASE } },
+    exit: (d: number) => ({ opacity: 0, x: reduce ? 0 : d * -16, transition: { duration: 0.14, ease: EASE } }),
   };
 
   const slotGroups = groupSlots(slots ?? []);
@@ -314,7 +316,6 @@ export function BookingWizard({
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.5, ease: EASE }}
             >
               {step === 0 && (
                 <StepShell title="Escolha o serviço" hint="Você pode combinar mais de um serviço compatível no mesmo atendimento.">
@@ -332,7 +333,7 @@ export function BookingWizard({
                               aria-pressed={active}
                               disabled={!compatible}
                               onClick={() => toggleService(s.id)}
-                              className={`group relative flex h-full w-full items-stretch gap-4 border p-3 text-left transition-all duration-500 ${
+                              className={`group relative flex h-full w-full items-stretch gap-4 border p-3 text-left transition-[border-color,box-shadow,opacity,transform] duration-200 ease-out active:scale-[0.985] ${
                                 active
                                   ? "border-ink bg-white shadow-[0_18px_40px_-28px_rgba(17,17,17,0.55)]"
                                   : "border-line bg-white hover:border-ink/40"
@@ -361,7 +362,7 @@ export function BookingWizard({
                                 ) : null}
                               </span>
                               <span
-                                className={`absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border transition-all duration-500 ${
+                                className={`absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border transition-[transform,background-color,border-color,color] duration-200 ease-out ${
                                   active ? "scale-100 border-ink bg-ink text-white" : "scale-90 border-line text-transparent"
                                 }`}
                                 aria-hidden="true"
@@ -412,7 +413,7 @@ export function BookingWizard({
                               className="h-20 w-16 shrink-0"
                             />
                             <span className="min-w-0">
-                              {p.specialty ? <span className="eyebrow block text-[0.6rem] text-accent-deep">{p.specialty}</span> : null}
+                              {p.specialty ? <span className="label block text-accent-deep">{p.specialty}</span> : null}
                               <span className="mt-1 block font-serif text-[1.4rem] leading-tight">{p.name}</span>
                               {p.bio ? <span className="mt-1 line-clamp-2 block text-xs leading-relaxed text-stone">{p.bio}</span> : null}
                             </span>
@@ -480,7 +481,7 @@ export function BookingWizard({
                     <div className={`space-y-8 transition-opacity ${slotsLoading ? "opacity-50" : ""}`}>
                       {slotGroups.map((g) => (
                         <div key={g.label}>
-                          <p className="eyebrow mb-3 text-stone">{g.label}</p>
+                          <p className="label mb-3 text-stone">{g.label}</p>
                           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                             {g.slots.map((s) => {
                               const active = slot?.startsAt === s.startsAt;
@@ -629,13 +630,13 @@ export function BookingWizard({
                         ["Valor total", `${anyFrom ? "a partir de " : ""}${formatPrice(totalPrice)}`],
                       ].map(([k, v]) => (
                         <div key={k} className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_1fr] sm:px-8">
-                          <dt className="eyebrow text-stone">{k}</dt>
+                          <dt className="label text-stone">{k}</dt>
                           <dd className="first-letter:uppercase">{v}</dd>
                         </div>
                       ))}
                       {customer.notes.trim() ? (
                         <div className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_1fr] sm:px-8">
-                          <dt className="eyebrow text-stone">Observações</dt>
+                          <dt className="label text-stone">Observações</dt>
                           <dd className="whitespace-pre-line text-sm text-stone">{customer.notes.trim()}</dd>
                         </div>
                       ) : null}
@@ -687,7 +688,7 @@ export function BookingWizard({
       {/* Resumo */}
       <aside className="lg:col-span-4" aria-label="Resumo do agendamento">
         <div className="sticky top-28 bg-ink p-7 text-white sm:p-8">
-          <p className="eyebrow text-accent">Seu agendamento</p>
+          <p className="label text-accent">Seu agendamento</p>
           <ul className="mt-6 space-y-3 border-b border-white/10 pb-6">
             <AnimatePresence initial={false}>
               {selected.length === 0 ? (
@@ -721,7 +722,7 @@ export function BookingWizard({
             <SummaryRow label="Horário" value={slot?.time ?? "—"} />
           </dl>
           <div className="flex items-end justify-between border-t border-white/10 pt-6">
-            <span className="eyebrow text-white/50">Total{anyFrom ? " (a partir de)" : ""}</span>
+            <span className="label text-white/60">Total{anyFrom ? " (a partir de)" : ""}</span>
             <motion.span key={totalPrice} initial={{ opacity: 0.3, y: 4 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl">
               {formatPrice(totalPrice)}
             </motion.span>
@@ -737,8 +738,8 @@ export function BookingWizard({
 function Progress({ step, onJump }: { step: number; onJump: (i: number) => void }) {
   return (
     <nav aria-label="Etapas do agendamento">
-      <p className="eyebrow text-stone sm:hidden">
-        Etapa {step + 1} de {STEPS.length} · <span className="text-ink">{STEPS[step]}</span>
+      <p className="label text-stone sm:hidden">
+        Etapa {step + 1} de {STEPS.length}: <span className="text-ink">{STEPS[step]}</span>
       </p>
       <ol className="hidden grid-cols-6 gap-4 sm:grid">
         {STEPS.map((label, i) => (
@@ -750,7 +751,7 @@ function Progress({ step, onJump }: { step: number; onJump: (i: number) => void 
               aria-current={i === step ? "step" : undefined}
               className="w-full text-left disabled:cursor-default"
             >
-              <span className={`block text-[0.6rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-500 ${i <= step ? "text-ink" : "text-stone/60"}`}>
+              <span className={`block text-[0.6rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 ${i <= step ? "text-ink" : "text-stone/60"}`}>
                 <span className="block text-accent-deep">0{i + 1}</span>
                 {label}
               </span>
@@ -763,7 +764,7 @@ function Progress({ step, onJump }: { step: number; onJump: (i: number) => void 
           className="absolute inset-y-0 left-0 bg-ink"
           initial={false}
           animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-          transition={{ duration: 0.8, ease: EASE }}
+          transition={{ duration: 0.4, ease: EASE }}
         />
       </div>
     </nav>
@@ -788,13 +789,13 @@ function ChoiceCard({ active, onClick, children }: { active: boolean; onClick: (
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`relative flex h-full w-full items-center gap-4 border p-3 pr-12 text-left transition-all duration-500 ${
+      className={`relative flex h-full w-full items-center gap-4 border p-3 pr-12 text-left transition-[border-color,box-shadow,transform] duration-200 ease-out active:scale-[0.985] ${
         active ? "border-ink bg-white shadow-[0_18px_40px_-28px_rgba(17,17,17,0.55)]" : "border-line bg-white hover:border-ink/40"
       }`}
     >
       {children}
       <span
-        className={`absolute right-4 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border transition-all duration-500 ${
+        className={`absolute right-4 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-200 ease-out ${
           active ? "border-ink bg-ink text-white" : "border-line text-transparent"
         }`}
         aria-hidden="true"

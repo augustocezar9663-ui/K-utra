@@ -39,15 +39,17 @@ export function LuxeCursor() {
   if (!enabled) return null;
   const ring = state === "link" ? 56 : state === "text" ? 4 : 30;
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[80] mix-blend-difference">
+    // contêiner de tamanho zero: a mesclagem (difference) cobre só o anel e o
+    // ponto, e não a tela inteira a cada quadro de rolagem
+    <div aria-hidden="true" className="pointer-events-none fixed left-0 top-0 z-[80] h-0 w-0 mix-blend-difference">
       <motion.div
-        className="absolute left-0 top-0 rounded-full border border-white"
+        className="absolute left-0 top-0 rounded-full border border-white will-change-transform"
         style={{ x: rx, y: ry, translateX: "-50%", translateY: "-50%" }}
         animate={{ width: ring, height: state === "text" ? 26 : ring, opacity: state === "hidden" ? 0 : state === "text" ? 0.9 : 0.7, borderRadius: state === "text" ? 2 : 999 }}
         transition={{ type: "spring", stiffness: 300, damping: 26 }}
       />
       <motion.div
-        className="absolute left-0 top-0 h-1.5 w-1.5 rounded-full bg-white"
+        className="absolute left-0 top-0 h-1.5 w-1.5 rounded-full bg-white will-change-transform"
         style={{ x, y, translateX: "-50%", translateY: "-50%" }}
         animate={{ opacity: state === "hidden" || state === "text" ? 0 : 1, scale: state === "link" ? 0 : 1 }}
       />

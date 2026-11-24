@@ -57,17 +57,10 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
       <div className="container-luxe">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <Reveal>
-              <p className="eyebrow flex items-center gap-4 text-accent-deep">
-                <span>03</span>
-                <span className="h-px w-10 bg-accent-deep/50" aria-hidden="true" />
-                <span className="text-stone">Galeria</span>
-              </p>
-            </Reveal>
             <div id="galeria-titulo">
               <RevealLines
-                className="mt-6 text-[clamp(2.4rem,5.6vw,4.6rem)] font-light leading-[1]"
-                lines={["Um portfólio", <em key="e" className="text-accent-deep">de transformações.</em>]}
+                className="text-[clamp(2.4rem,5.6vw,4.6rem)] font-light leading-[1]"
+                lines={["Um portfólio", "de transformações."]}
               />
             </div>
           </div>
@@ -80,7 +73,7 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
                     role="tab"
                     aria-selected={filter === c}
                     onClick={() => setFilter(c)}
-                    className={`min-h-10 border px-4 text-[0.66rem] font-semibold uppercase tracking-[0.2em] transition-colors duration-500 ${
+                    className={`min-h-10 border px-4 text-[0.66rem] font-semibold uppercase tracking-[0.2em] transition-colors duration-200 ${
                       filter === c ? "border-ink bg-ink text-white" : "border-line text-stone hover:border-ink hover:text-ink"
                     }`}
                   >
@@ -128,11 +121,11 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
                       alt={img.alt}
                       fill
                       sizes="(min-width: 768px) 50vw, 100vw"
-                      className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                     />
-                    <span className="absolute inset-0 bg-ink/0 transition-colors duration-700 group-hover:bg-ink/15" />
+                    <span className="absolute inset-0 bg-ink/0 transition-colors duration-300 ease-out group-hover:bg-ink/15" />
                     {img.category ? (
-                      <span className="eyebrow absolute bottom-4 left-4 translate-y-2 text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                      <span className="label absolute bottom-4 left-4 translate-y-2 text-white opacity-0 transition-[opacity,transform] duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
                         {img.category}
                       </span>
                     ) : null}
@@ -202,7 +195,7 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
                 >
                   <ChevronRight strokeWidth={1.25} />
                 </button>
-                <p className="eyebrow absolute bottom-6 left-1/2 -translate-x-1/2 text-white/60">
+                <p className="label absolute bottom-6 left-1/2 tabular-nums -translate-x-1/2 text-white/60">
                   {active + 1} / {visible.length}
                 </p>
               </>

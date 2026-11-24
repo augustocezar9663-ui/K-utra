@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight, Clock } from "lucide-react";
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { ParallaxFrame } from "@/components/motion/parallax-media";
 import { Media } from "@/components/ui/media";
@@ -23,7 +23,6 @@ export function ServicesSection({ services }: { services: Service[] }) {
   const reduce = useReducedMotion();
   const [pinned, setPinned] = useState(false);
   const [distance, setDistance] = useState(0);
-  const [index, setIndex] = useState(1);
 
   useEffect(() => {
     const mq = matchMedia("(min-width: 1024px) and (min-height: 640px)");
@@ -45,13 +44,10 @@ export function ServicesSection({ services }: { services: Service[] }) {
   }, [pinned]);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
-  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.35 });
-  const x = useTransform(smooth, [0, 1], [0, -distance]);
-  const imgX = useTransform(smooth, [0, 1], ["-6.5%", "6.5%"]);
-  const bar = useTransform(smooth, [0, 1], [0.06, 1]);
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    setIndex(Math.min(services.length, Math.max(1, Math.round(v * (services.length - 1)) + 1)));
-  });
+  // a rolagem já é suavizada pelo Lenis: seguir o progresso diretamente evita
+  // dupla suavização (atraso e sensação "borrachuda")
+  const x = useTransform(scrollYProgress, [0, 1], [0, -distance]);
+  const imgX = useTransform(scrollYProgress, [0, 1], ["-6.5%", "6.5%"]);
 
   // teclado: o foco num card fora da tela rola a página até a posição da
   // trilha em que ele aparece (overflow-clip impede o navegador de deslocar
@@ -67,16 +63,9 @@ export function ServicesSection({ services }: { services: Service[] }) {
 
   const heading = (
     <div className={pinned ? "flex w-[min(34vw,520px)] shrink-0 flex-col justify-center pr-10" : ""}>
-      <Reveal>
-        <p className="eyebrow flex items-center gap-4 text-accent-deep">
-          <span>01</span>
-          <span className="h-px w-10 bg-accent-deep/50" aria-hidden="true" />
-          <span className="text-stone">Serviços</span>
-        </p>
-      </Reveal>
       <RevealLines
-        className="mt-6 text-[clamp(2.4rem,5.2vw,4.6rem)] font-light leading-[1]"
-        lines={["Rituais de beleza,", <em key="e" className="text-accent-deep">sob medida.</em>]}
+        className="text-[clamp(2.4rem,5.2vw,4.6rem)] font-light leading-[1]"
+        lines={["Cortes e rituais", "sob medida."]}
       />
       <Reveal delay={0.15}>
         <p className="mt-8 max-w-sm text-base leading-relaxed text-stone">
@@ -84,15 +73,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
           olhar no espelho.
         </p>
       </Reveal>
-      {pinned ? (
-        <div className="mt-12 flex items-center gap-5" aria-hidden="true">
-          <span className="font-serif text-3xl tabular-nums">{String(index).padStart(2, "0")}</span>
-          <span className="relative h-px w-32 bg-line">
-            <motion.span className="absolute inset-0 origin-left bg-ink" style={{ scaleX: bar }} />
-          </span>
-          <span className="text-sm text-stone tabular-nums">{String(services.length).padStart(2, "0")}</span>
-        </div>
-      ) : null}
+      {pinned ? <TrackProgress progress={scrollYProgress} total={services.length} /> : null}
     </div>
   );
 
@@ -145,7 +126,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
                           tone={TONES[i % TONES.length]}
                           sizes="380px"
                           className="h-full w-full"
-                          imgClassName="transition-transform duration-[1.4s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+                          imgClassName="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                           label={s.image_url ? undefined : s.category ?? undefined}
                         />
                       </motion.div>
@@ -164,11 +145,8 @@ export function ServicesSection({ services }: { services: Service[] }) {
                     </ParallaxFrame>
                   )}
                 </Link>
-                <div className="flex flex-1 flex-col border-b border-line pb-6 pt-5 transition-colors duration-500 group-hover:border-ink">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="text-[1.75rem] leading-tight">{s.name}</h3>
-                    <span className="eyebrow shrink-0 text-stone">{String(i + 1).padStart(2, "0")}</span>
-                  </div>
+                <div className="flex flex-1 flex-col border-b border-line pb-6 pt-5 transition-colors duration-200 ease-out group-hover:border-ink">
+                  <h3 className="text-[1.75rem] leading-tight">{s.name}</h3>
                   {s.description ? (
                     <p className="mt-2 line-clamp-2 text-[0.92rem] leading-relaxed text-stone">{s.description}</p>
                   ) : null}
@@ -189,7 +167,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
                     >
                       <span className="link-underline pb-1">Agendar</span>
                       <ArrowUpRight
-                        className="h-4 w-4 transition-transform duration-500 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5"
+                        className="h-4 w-4 transition-transform duration-200 ease-out group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5"
                         strokeWidth={1.5}
                         aria-hidden="true"
                       />
@@ -202,5 +180,26 @@ export function ServicesSection({ services }: { services: Service[] }) {
         </motion.ul>
       </div>
     </section>
+  );
+}
+
+/**
+ * Contador "03 / 09" isolado: só ele re-renderiza quando o card em foco muda
+ * (antes, cada troca re-renderizava os nove cards da trilha).
+ */
+function TrackProgress({ progress, total }: { progress: MotionValue<number>; total: number }) {
+  const [index, setIndex] = useState(1);
+  const bar = useTransform(progress, [0, 1], [0.06, 1]);
+  useMotionValueEvent(progress, "change", (v) => {
+    setIndex(Math.min(total, Math.max(1, Math.round(v * (total - 1)) + 1)));
+  });
+  return (
+    <div className="mt-12 flex items-center gap-5" aria-hidden="true">
+      <span className="font-serif text-3xl tabular-nums">{String(index).padStart(2, "0")}</span>
+      <span className="relative h-px w-32 bg-line">
+        <motion.span className="absolute inset-0 origin-left bg-ink" style={{ scaleX: bar }} />
+      </span>
+      <span className="text-sm tabular-nums text-stone">{String(total).padStart(2, "0")}</span>
+    </div>
   );
 }

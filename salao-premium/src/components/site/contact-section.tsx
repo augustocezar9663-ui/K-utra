@@ -31,9 +31,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
       <div className="container-luxe">
         <div id="contato-titulo">
           <SectionHeading
-            index="06"
-            eyebrow="Localização & contato"
-            lines={["Esperamos por você.", <em key="e" className="text-accent-deep">Com hora marcada.</em>]}
+            lines={["Esperamos por você,", "com hora marcada."]}
           />
         </div>
 
@@ -41,65 +39,65 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
           <Reveal className="lg:col-span-5">
             <dl className="divide-y divide-line border-y border-line">
               {address.hasAddress ? (
-                <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                  <MapPin className="mt-1 h-4 w-4 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
-                  <div>
-                    <dt className="eyebrow text-stone">Endereço</dt>
-                    <dd className="mt-2 text-lg leading-snug">
-                      {address.line1}
-                      <br />
-                      <span className="text-stone">{address.line2}</span>
-                      {settings.address_zip ? <span className="block text-sm text-stone">CEP {settings.address_zip}</span> : null}
-                    </dd>
-                  </div>
+                <div className="py-6">
+                  <dt className="label flex items-center gap-3 text-stone">
+                    <MapPin className="h-4 w-4 shrink-0 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
+                    Endereço
+                  </dt>
+                  <dd className="mt-2 pl-7 text-lg leading-snug">
+                    {address.line1}
+                    <br />
+                    <span className="text-stone">{address.line2}</span>
+                    {settings.address_zip ? <span className="block text-sm text-stone">CEP {settings.address_zip}</span> : null}
+                  </dd>
                 </div>
               ) : null}
               {settings.phone || wa ? (
-                <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                  <Phone className="mt-1 h-4 w-4 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
-                  <div>
-                    <dt className="eyebrow text-stone">Telefone & WhatsApp</dt>
-                    <dd className="mt-2 space-y-1 text-lg">
-                      {settings.phone ? (
-                        <a className="link-underline block w-fit" href={`tel:+55${settings.phone.replace(/\D/g, "")}`}>
-                          {formatPhone(settings.phone)}
-                        </a>
-                      ) : null}
-                      {wa ? (
-                        <a className="link-underline flex w-fit items-center gap-2" href={wa} target="_blank" rel="noopener noreferrer">
-                          <WhatsAppIcon className="h-4 w-4" /> {formatPhone(settings.whatsapp)}
-                        </a>
-                      ) : null}
-                    </dd>
-                  </div>
+                <div className="py-6">
+                  <dt className="label flex items-center gap-3 text-stone">
+                    <Phone className="h-4 w-4 shrink-0 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
+                    Telefone & WhatsApp
+                  </dt>
+                  <dd className="mt-2 pl-7 space-y-1 text-lg">
+                    {settings.phone ? (
+                      <a className="link-underline block w-fit" href={`tel:+55${settings.phone.replace(/\D/g, "")}`}>
+                        {formatPhone(settings.phone)}
+                      </a>
+                    ) : null}
+                    {wa ? (
+                      <a className="link-underline flex w-fit items-center gap-2" href={wa} target="_blank" rel="noopener noreferrer">
+                        <WhatsAppIcon className="h-4 w-4" /> {formatPhone(settings.whatsapp)}
+                      </a>
+                    ) : null}
+                  </dd>
                 </div>
               ) : null}
               {ig ? (
-                <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                  <InstagramIcon className="mt-1 h-4 w-4 text-accent-deep" />
-                  <div>
-                    <dt className="eyebrow text-stone">Instagram</dt>
-                    <dd className="mt-2 text-lg">
-                      <a className="link-underline" href={ig} target="_blank" rel="noopener noreferrer">
-                        @{settings.instagram?.replace(/^@/, "")}
-                      </a>
-                    </dd>
-                  </div>
-                </div>
-              ) : null}
-              <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                <Clock className="mt-1 h-4 w-4 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
-                <div>
-                  <dt className="eyebrow text-stone">Horário de funcionamento</dt>
-                  <dd className="mt-3 space-y-2">
-                    {schedule.map((g) => (
-                      <p key={g.label} className="flex justify-between gap-6 text-[0.95rem]">
-                        <span>{g.label}</span>
-                        <span className={g.closed ? "text-stone" : ""}>{g.value}</span>
-                      </p>
-                    ))}
+                <div className="py-6">
+                  <dt className="label flex items-center gap-3 text-stone">
+                    <InstagramIcon className="h-4 w-4 shrink-0 text-accent-deep" />
+                    Instagram
+                  </dt>
+                  <dd className="mt-2 pl-7 text-lg">
+                    <a className="link-underline" href={ig} target="_blank" rel="noopener noreferrer">
+                      @{settings.instagram?.replace(/^@/, "")}
+                    </a>
                   </dd>
                 </div>
+              ) : null}
+              <div className="py-6">
+                <dt className="label flex items-center gap-3 text-stone">
+                  <Clock className="h-4 w-4 shrink-0 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
+                  Horário de funcionamento
+                </dt>
+                <dd className="mt-3 pl-7 space-y-2">
+                  {schedule.map((g) => (
+                    <p key={g.label} className="flex justify-between gap-6 text-[0.95rem]">
+                      <span>{g.label}</span>
+                      <span className={g.closed ? "text-stone" : ""}>{g.value}</span>
+                    </p>
+                  ))}
+                </dd>
               </div>
             </dl>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">

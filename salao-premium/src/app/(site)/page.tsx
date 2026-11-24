@@ -39,7 +39,7 @@ export default async function HomePage() {
       <AboutSection imageUrl={settings.about_image_url} name={settings.name} />
       <section aria-label="Especialidades" data-tone="#ffffff" className="py-10 md:py-16">
         <VelocityMarquee
-          items={services.length ? services.map((s) => s.name) : ["Corte", "Coloração", "Mechas", "Tratamentos", "Penteados"]}
+          items={services.length ? services.map((s) => s.name) : ["Corte masculino", "Barba", "Coloração", "Pigmentação", "Hidratação"]}
           className="font-serif text-[clamp(3.2rem,9vw,8.5rem)] font-light leading-none text-ink"
         />
       </section>

@@ -16,7 +16,7 @@ export function hairSalonJsonLd(s: BusinessSettings, hours: WorkingHour[], servi
     url: SITE_URL,
     description:
       s.description ??
-      "Uma experiência de beleza exclusiva, pensada para valorizar sua personalidade e transformar seu visual.",
+      "Corte masculino, barba e cuidados capilares com hora marcada.",
     priceRange: "$$$",
   };
   if (s.logo_url) data.logo = s.logo_url;

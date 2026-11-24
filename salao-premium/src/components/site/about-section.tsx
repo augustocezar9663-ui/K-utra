@@ -36,17 +36,10 @@ export function AboutSection({ imageUrl, name }: { imageUrl: string | null; name
         </div>
 
         <div className="flex flex-col justify-center md:col-span-5 md:col-start-8">
-          <Reveal>
-            <p className="eyebrow flex items-center gap-4 text-accent-deep">
-              <span>02</span>
-              <span className="h-px w-10 bg-accent-deep/50" aria-hidden="true" />
-              <span className="text-stone">Sobre nós</span>
-            </p>
-          </Reveal>
           <div id="sobre-titulo">
             <RevealLines
-              className="mt-6 text-[clamp(2.4rem,5vw,4.2rem)] font-light uppercase leading-[1]"
-              lines={["Mais do que beleza.", <em key="e" className="normal-case text-accent-deep">Uma experiência.</em>]}
+              className="text-[clamp(2.4rem,5vw,4.2rem)] font-light uppercase leading-[1]"
+              lines={["Mais do que beleza.", "Uma experiência."]}
             />
           </div>
           <ScrollWords
@@ -55,12 +48,9 @@ export function AboutSection({ imageUrl, name }: { imageUrl: string | null; name
           />
           <ul className="mt-12 divide-y divide-line border-y border-line">
             {PILLARS.map((p, i) => (
-              <Reveal as="li" key={p.title} delay={0.1 + i * 0.08} className="grid grid-cols-[3rem_1fr] gap-4 py-6">
-                <span className="font-serif text-xl italic text-accent-deep">0{i + 1}</span>
-                <div>
-                  <h3 className="text-2xl">{p.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-stone">{p.text}</p>
-                </div>
+              <Reveal as="li" key={p.title} delay={0.06 + i * 0.06} className="grid gap-1 py-6 sm:grid-cols-[9.5rem_1fr] sm:gap-6">
+                <h3 className="text-2xl leading-tight">{p.title}</h3>
+                <p className="text-sm leading-relaxed text-stone sm:pt-1">{p.text}</p>
               </Reveal>
             ))}
           </ul>

@@ -36,7 +36,7 @@ export function ParallaxFrame({
       initial={reveal && !reduce ? { clipPath: hidden } : false}
       whileInView={{ clipPath: "inset(0% 0% 0% 0%)" }}
       viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: 1.0, ease: [0.77, 0, 0.175, 1] }}
     >
       <motion.div className="absolute inset-x-0" style={{ y, top: `-${bleed}%`, bottom: `-${bleed}%` }}>
         <motion.div
@@ -44,7 +44,7 @@ export function ParallaxFrame({
           initial={reveal && !reduce ? { scale: 1.18 } : false}
           whileInView={{ scale: 1 }}
           viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-          transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.3, ease: [0.23, 1, 0.32, 1] }}
         >
           {children}
         </motion.div>

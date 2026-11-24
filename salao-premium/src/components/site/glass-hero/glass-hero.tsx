@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { Artwork } from "@/components/ui/artwork";
 import type { GlassHeroHandle, HeroCopy, HeroLayout, HoverKey, TextItem } from "./engine";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+const EASE = [0.23, 1, 0.32, 1] as const;
 
 /**
  * Hero de vidro estilhaçado. Enquanto o WebGL não está pronto (ou quando o
@@ -25,7 +25,7 @@ export function GlassHero({ name, city, imageUrl }: { name: string; city: string
   const [layout, setLayout] = useState<HeroLayout | null>(null);
 
   const copy: HeroCopy = {
-    eyebrow: `${name}${city ? ` · ${city}` : ""}`.toUpperCase(),
+    eyebrow: (city ? `Corte masculino em ${city}` : "Corte masculino com hora marcada").toUpperCase(),
     lines: [{ text: "SEU ESTILO." }, { text: "Sua identidade.", italic: true }, { text: "NOSSO CUIDADO." }],
     sub: ["Uma experiência de beleza exclusiva, pensada para valorizar", "sua personalidade e transformar seu visual."],
     primary: "AGENDAR EXPERIÊNCIA",
@@ -216,8 +216,7 @@ function StaticHero({
       <div className="container-luxe relative w-full pb-16 pt-36 md:pb-24">
         <p className="eyebrow mb-8 flex items-center gap-4 text-accent">
           <span className="h-px w-10 bg-accent" aria-hidden="true" />
-          {name}
-          {city ? ` · ${city}` : ""}
+          {city ? `Corte masculino em ${city}` : "Corte masculino com hora marcada"}
         </p>
         <h1 className="max-w-5xl text-[clamp(2.9rem,9vw,7.6rem)] font-light uppercase leading-[0.92] tracking-[-0.015em]">
           <span className="block">Seu estilo.</span>
