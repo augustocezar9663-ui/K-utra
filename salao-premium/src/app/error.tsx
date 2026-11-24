@@ -9,7 +9,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
   return (
     <main className="flex min-h-screen items-center bg-cream">
       <div className="container-luxe">
-        <p className="eyebrow text-champagne-deep">Algo saiu do lugar</p>
+        <p className="eyebrow text-accent-deep">Algo saiu do lugar</p>
         <h1 className="mt-6 max-w-2xl text-[clamp(2.6rem,7vw,5rem)] font-light leading-[1]">
           Não foi possível carregar esta página.
         </h1>

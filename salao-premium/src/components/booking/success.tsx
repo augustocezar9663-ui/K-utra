@@ -75,7 +75,7 @@ export function BookingSuccess({
           cy="48"
           r="45"
           fill="none"
-          stroke="#B89B72"
+          stroke="#1F4FD6"
           strokeWidth="1.2"
           variants={{ hidden: { pathLength: 0 }, visible: { pathLength: 1 } }}
           transition={{ duration: 1.1, ease: [0.65, 0, 0.35, 1] }}
@@ -93,7 +93,7 @@ export function BookingSuccess({
       </motion.svg>
 
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.8 }}>
-        <p className="eyebrow mt-8 text-champagne-deep">{pending ? "Solicitação registrada" : "Agendamento confirmado"}</p>
+        <p className="eyebrow mt-8 text-accent-deep">{pending ? "Solicitação registrada" : "Agendamento confirmado"}</p>
         <h2 className="mt-4 text-[clamp(2.4rem,6vw,3.8rem)] font-light leading-[1.02]">
           {pending ? "Seu horário está reservado." : "Tudo pronto para receber você."}
         </h2>
@@ -129,7 +129,7 @@ export function BookingSuccess({
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {wa ? (
             <a href={wa} target="_blank" rel="noopener noreferrer" className="btn btn-primary sm:col-span-2">
-              <WhatsAppIcon className="h-4 w-4 text-champagne" />
+              <WhatsAppIcon className="h-4 w-4 text-accent" />
               {pending ? "Solicitar confirmação no WhatsApp" : "Falar com o salão no WhatsApp"}
             </a>
           ) : null}

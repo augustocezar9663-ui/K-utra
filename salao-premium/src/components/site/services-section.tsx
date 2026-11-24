@@ -10,7 +10,7 @@ import { Reveal, RevealLines } from "@/components/ui/reveal";
 import { formatDuration, formatPrice } from "@/lib/format";
 import type { Service } from "@/lib/types";
 
-const TONES = ["ink", "sand", "champagne", "cream"] as const;
+const TONES = ["ink", "sand", "accent", "cream"] as const;
 
 /**
  * Serviços. No desktop a seção "prende" na tela e a rolagem vertical
@@ -68,15 +68,15 @@ export function ServicesSection({ services }: { services: Service[] }) {
   const heading = (
     <div className={pinned ? "flex w-[min(34vw,520px)] shrink-0 flex-col justify-center pr-10" : ""}>
       <Reveal>
-        <p className="eyebrow flex items-center gap-4 text-champagne-deep">
+        <p className="eyebrow flex items-center gap-4 text-accent-deep">
           <span>01</span>
-          <span className="h-px w-10 bg-champagne-deep/50" aria-hidden="true" />
+          <span className="h-px w-10 bg-accent-deep/50" aria-hidden="true" />
           <span className="text-stone">Serviços</span>
         </p>
       </Reveal>
       <RevealLines
         className="mt-6 text-[clamp(2.4rem,5.2vw,4.6rem)] font-light leading-[1]"
-        lines={["Rituais de beleza,", <em key="e" className="text-champagne-deep">sob medida.</em>]}
+        lines={["Rituais de beleza,", <em key="e" className="text-accent-deep">sob medida.</em>]}
       />
       <Reveal delay={0.15}>
         <p className="mt-8 max-w-sm text-base leading-relaxed text-stone">
@@ -98,7 +98,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
 
   if (services.length === 0) {
     return (
-      <section id="servicos" ref={sectionRef} data-tone="#f7f5f2" className="py-24 md:py-36">
+      <section id="servicos" ref={sectionRef} data-tone="#eef2f9" className="py-24 md:py-36">
         <div className="container-luxe">
           {heading}
           <p className="mt-16 border-t border-line pt-10 text-stone">
@@ -113,7 +113,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
     <section
       id="servicos"
       ref={sectionRef}
-      data-tone="#f7f5f2"
+      data-tone="#eef2f9"
       aria-label="Serviços"
       className={`relative z-10 -mt-[25svh] motion-reduce:mt-0 ${pinned ? "lg:-mt-[55svh]" : "py-24 md:py-36"}`}
       style={pinned ? { height: `calc(100svh + ${distance}px)` } : undefined}

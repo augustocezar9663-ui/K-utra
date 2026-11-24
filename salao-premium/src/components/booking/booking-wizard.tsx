@@ -268,7 +268,7 @@ export function BookingWizard({
   if (!salon.configured) {
     return (
       <div className="mx-auto max-w-xl border border-line bg-white p-10 text-center">
-        <p className="eyebrow text-champagne-deep">Em breve</p>
+        <p className="eyebrow text-accent-deep">Em breve</p>
         <h2 className="mt-4 text-4xl font-light">Agendamento online em configuração</h2>
         <p className="mt-4 text-stone">
           Enquanto isso, fale com a nossa equipe para reservar o seu horário.
@@ -342,7 +342,7 @@ export function BookingWizard({
                                 src={s.image_url}
                                 alt=""
                                 seed={s.slug}
-                                tone={(["ink", "sand", "champagne", "cream"] as const)[i % 4]}
+                                tone={(["ink", "sand", "accent", "cream"] as const)[i % 4]}
                                 sizes="88px"
                                 className="h-auto min-h-24 w-20 shrink-0 sm:w-22"
                               />
@@ -388,7 +388,7 @@ export function BookingWizard({
                     <ul className="grid gap-3 sm:grid-cols-2">
                       <li className="sm:col-span-2">
                         <ChoiceCard active={professionalId === null} onClick={() => chooseProfessional(null)}>
-                          <span className="flex h-16 w-16 shrink-0 items-center justify-center bg-ink text-champagne">
+                          <span className="flex h-16 w-16 shrink-0 items-center justify-center bg-ink text-accent">
                             <Sparkles className="h-5 w-5" strokeWidth={1.25} />
                           </span>
                           <span>
@@ -407,12 +407,12 @@ export function BookingWizard({
                               src={p.photo_url}
                               alt={`Foto de ${p.name}`}
                               seed={p.slug}
-                              tone={i % 2 ? "champagne" : "sand"}
+                              tone={i % 2 ? "accent" : "sand"}
                               sizes="72px"
                               className="h-20 w-16 shrink-0"
                             />
                             <span className="min-w-0">
-                              {p.specialty ? <span className="eyebrow block text-[0.6rem] text-champagne-deep">{p.specialty}</span> : null}
+                              {p.specialty ? <span className="eyebrow block text-[0.6rem] text-accent-deep">{p.specialty}</span> : null}
                               <span className="mt-1 block font-serif text-[1.4rem] leading-tight">{p.name}</span>
                               {p.bio ? <span className="mt-1 line-clamp-2 block text-xs leading-relaxed text-stone">{p.bio}</span> : null}
                             </span>
@@ -687,7 +687,7 @@ export function BookingWizard({
       {/* Resumo */}
       <aside className="lg:col-span-4" aria-label="Resumo do agendamento">
         <div className="sticky top-28 bg-ink p-7 text-white sm:p-8">
-          <p className="eyebrow text-champagne">Seu agendamento</p>
+          <p className="eyebrow text-accent">Seu agendamento</p>
           <ul className="mt-6 space-y-3 border-b border-white/10 pb-6">
             <AnimatePresence initial={false}>
               {selected.length === 0 ? (
@@ -751,7 +751,7 @@ function Progress({ step, onJump }: { step: number; onJump: (i: number) => void 
               className="w-full text-left disabled:cursor-default"
             >
               <span className={`block text-[0.6rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-500 ${i <= step ? "text-ink" : "text-stone/60"}`}>
-                <span className="block text-champagne-deep">0{i + 1}</span>
+                <span className="block text-accent-deep">0{i + 1}</span>
                 {label}
               </span>
             </button>

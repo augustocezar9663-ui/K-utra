@@ -33,7 +33,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
           <SectionHeading
             index="06"
             eyebrow="Localização & contato"
-            lines={["Esperamos por você.", <em key="e" className="text-champagne-deep">Com hora marcada.</em>]}
+            lines={["Esperamos por você.", <em key="e" className="text-accent-deep">Com hora marcada.</em>]}
           />
         </div>
 
@@ -42,7 +42,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
             <dl className="divide-y divide-line border-y border-line">
               {address.hasAddress ? (
                 <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                  <MapPin className="mt-1 h-4 w-4 text-champagne-deep" strokeWidth={1.5} aria-hidden="true" />
+                  <MapPin className="mt-1 h-4 w-4 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
                   <div>
                     <dt className="eyebrow text-stone">Endereço</dt>
                     <dd className="mt-2 text-lg leading-snug">
@@ -56,7 +56,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
               ) : null}
               {settings.phone || wa ? (
                 <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                  <Phone className="mt-1 h-4 w-4 text-champagne-deep" strokeWidth={1.5} aria-hidden="true" />
+                  <Phone className="mt-1 h-4 w-4 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
                   <div>
                     <dt className="eyebrow text-stone">Telefone & WhatsApp</dt>
                     <dd className="mt-2 space-y-1 text-lg">
@@ -76,7 +76,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
               ) : null}
               {ig ? (
                 <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                  <InstagramIcon className="mt-1 h-4 w-4 text-champagne-deep" />
+                  <InstagramIcon className="mt-1 h-4 w-4 text-accent-deep" />
                   <div>
                     <dt className="eyebrow text-stone">Instagram</dt>
                     <dd className="mt-2 text-lg">
@@ -88,7 +88,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
                 </div>
               ) : null}
               <div className="grid grid-cols-[2rem_1fr] gap-4 py-6">
-                <Clock className="mt-1 h-4 w-4 text-champagne-deep" strokeWidth={1.5} aria-hidden="true" />
+                <Clock className="mt-1 h-4 w-4 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
                 <div>
                   <dt className="eyebrow text-stone">Horário de funcionamento</dt>
                   <dd className="mt-3 space-y-2">

@@ -30,7 +30,7 @@ export function Brand({
       {tagline ? (
         <span
           className={`mt-1 text-[0.56rem] font-semibold uppercase tracking-[0.42em] transition-colors duration-500 ${
-            light ? "text-champagne" : "text-stone"
+            light ? "text-accent" : "text-stone"
           }`}
         >
           {tagline}

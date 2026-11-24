@@ -75,7 +75,7 @@ export function AdminSidebar({ salonName }: { salonName: string }) {
         <div className="mb-8 flex items-center justify-between px-4">
           <div>
             <p className="font-serif text-2xl">{salonName}</p>
-            <p className="eyebrow mt-1 text-[0.58rem] text-champagne">Painel</p>
+            <p className="eyebrow mt-1 text-[0.58rem] text-accent">Painel</p>
           </div>
           <button onClick={() => setOpen(false)} aria-label="Fechar menu" className="flex h-10 w-10 items-center justify-center lg:hidden">
             <X className="h-5 w-5" strokeWidth={1.5} />

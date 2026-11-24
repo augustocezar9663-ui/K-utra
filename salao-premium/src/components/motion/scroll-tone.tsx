@@ -39,9 +39,12 @@ export function ScrollTone() {
       if (next) {
         const t = smooth(Math.min(1, Math.max(0, (marker - (sections[i].bottom - blend)) / blend)));
         r += (next.rgb[0] - r) * t; g += (next.rgb[1] - g) * t; b += (next.rgb[2] - b) * t;
-        // passa por um tom quente (champagne) em vez de um cinza neutro
-        const warm = 4 * t * (1 - t) * 0.38;
-        r += (184 - r) * warm; g += (155 - g) * warm; b += (114 - b) * warm;
+        // passa por um azul profundo em vez de um cinza neutro
+        // só tinge quando os dois tons são realmente diferentes
+        const [r0, g0, b0] = sections[i].rgb;
+        const dist = Math.hypot(next.rgb[0] - r0, next.rgb[1] - g0, next.rgb[2] - b0);
+        const warm = 4 * t * (1 - t) * 0.38 * Math.min(1, dist / 220);
+        r += (31 - r) * warm; g += (79 - g) * warm; b += (214 - b) * warm;
       }
       const color = `rgb(${r | 0}, ${g | 0}, ${b | 0})`;
       document.body.style.backgroundColor = color;

@@ -54,7 +54,7 @@ export function ProfessionalsManager({ professionals, services, hours }: Props) 
           const custom = hours.some((h) => h.professional_id === p.id);
           return (
             <li key={p.id} className="flex gap-4 border border-line bg-white p-4">
-              <Media src={p.photo_url} alt="" seed={p.slug} tone={i % 2 ? "champagne" : "sand"} sizes="80px" className="h-24 w-20 shrink-0" />
+              <Media src={p.photo_url} alt="" seed={p.slug} tone={i % 2 ? "accent" : "sand"} sizes="80px" className="h-24 w-20 shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="font-serif text-xl leading-tight">{p.name}</p>
                 <p className="text-xs text-stone">{p.specialty ?? "—"}</p>

@@ -57,7 +57,7 @@ export const STATUS_LABEL: Record<AppointmentStatus, string> = {
 };
 
 const STATUS_STYLE: Record<AppointmentStatus, string> = {
-  pending: "bg-champagne/30 text-[#6b5530]",
+  pending: "bg-accent/30 text-[#1e3a8a]",
   confirmed: "bg-[#e3ece4] text-[#2f5a3b]",
   completed: "bg-ink text-white",
   cancelled: "bg-[#f3e3e0] text-[#8a3a30]",

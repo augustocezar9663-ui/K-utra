@@ -51,7 +51,7 @@ export async function sendBookingEmails(e: ConfirmationEmail): Promise<boolean> 
     ["Duração estimada", formatDuration(e.durationMinutes)],
     ["Valor estimado", formatPrice(e.totalPriceCents)],
   ];
-  const html = `<!doctype html><html><body style="margin:0;background:#F7F5F2;font-family:Helvetica,Arial,sans-serif;color:#111">
+  const html = `<!doctype html><html><body style="margin:0;background:#EEF2F9;font-family:Helvetica,Arial,sans-serif;color:#111">
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 16px"><tr><td align="center">
   <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;padding:48px 40px">
     <tr><td style="font-family:Georgia,serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#777">${esc(e.settings.name)}</td></tr>

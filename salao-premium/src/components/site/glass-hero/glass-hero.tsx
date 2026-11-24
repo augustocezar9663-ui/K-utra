@@ -99,7 +99,7 @@ export function GlassHero({ name, city, imageUrl }: { name: string; city: string
     >
       {/* marcador de tom: o fundo começa a clarear antes do fim da hero,
           enquanto os serviços sobem por cima dos últimos cacos */}
-      <div aria-hidden="true" data-tone="#0d0c0b" className="pointer-events-none absolute inset-x-0 top-0 h-[160svh] lg:h-[130svh] motion-reduce:h-[100svh]" />
+      <div aria-hidden="true" data-tone="#05070c" className="pointer-events-none absolute inset-x-0 top-0 h-[160svh] lg:h-[130svh] motion-reduce:h-[100svh]" />
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* WebGL */}
         <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 h-full w-full motion-reduce:hidden" />
@@ -214,14 +214,14 @@ function StaticHero({
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-ink/30" />
       </div>
       <div className="container-luxe relative w-full pb-16 pt-36 md:pb-24">
-        <p className="eyebrow mb-8 flex items-center gap-4 text-champagne">
-          <span className="h-px w-10 bg-champagne" aria-hidden="true" />
+        <p className="eyebrow mb-8 flex items-center gap-4 text-accent">
+          <span className="h-px w-10 bg-accent" aria-hidden="true" />
           {name}
           {city ? ` · ${city}` : ""}
         </p>
         <h1 className="max-w-5xl text-[clamp(2.9rem,9vw,7.6rem)] font-light uppercase leading-[0.92] tracking-[-0.015em]">
           <span className="block">Seu estilo.</span>
-          <span className="block italic normal-case text-champagne">Sua identidade.</span>
+          <span className="block italic normal-case text-accent">Sua identidade.</span>
           <span className="block">Nosso cuidado.</span>
         </h1>
         <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:items-end">
@@ -229,7 +229,7 @@ function StaticHero({
             Uma experiência de beleza exclusiva, pensada para valorizar sua personalidade e transformar seu visual.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row md:col-span-7 md:justify-end">
-            <Link href="/agendar" className="btn btn-champagne">
+            <Link href="/agendar" className="btn btn-accent">
               Agendar experiência
             </Link>
             <a href="#servicos" className="btn btn-ghost-light">

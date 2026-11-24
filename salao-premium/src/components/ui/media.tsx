@@ -20,7 +20,7 @@ export function Media({
   src: string | null | undefined;
   alt: string;
   seed: string;
-  tone?: "ink" | "cream" | "sand" | "champagne";
+  tone?: "ink" | "cream" | "sand" | "accent";
   sizes?: string;
   preload?: boolean;
   className?: string;

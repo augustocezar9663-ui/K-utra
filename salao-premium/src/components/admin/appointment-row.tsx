@@ -70,7 +70,7 @@ export function AppointmentRow({
             <a href={`tel:+55${a.customer_phone}`} className="underline-offset-4 hover:underline">{formatPhone(a.customer_phone)}</a>
             {a.customer_email ? <> · <a href={`mailto:${a.customer_email}`} className="underline-offset-4 hover:underline">{a.customer_email}</a></> : null}
           </p>
-          {a.notes ? <p className="mt-2 border-l-2 border-champagne pl-3 text-sm italic text-stone">{a.notes}</p> : null}
+          {a.notes ? <p className="mt-2 border-l-2 border-accent pl-3 text-sm italic text-stone">{a.notes}</p> : null}
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:max-w-[280px] md:justify-end">
           {transitions.map((t) => (

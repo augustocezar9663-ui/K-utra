@@ -22,7 +22,7 @@ export function ReviewsManager({ reviews, today }: { reviews: Review[]; today: s
           <li key={r.id} className="border border-line bg-white p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-medium">{r.author_name} <span className="text-xs text-stone">· {r.review_date.split("-").reverse().join("/")}{r.source ? ` · ${r.source}` : ""}{!r.is_published ? " · não publicada" : ""}</span></p>
-              <span className="flex gap-0.5" aria-label={`Nota ${r.rating}`}>{Array.from({ length: 5 }, (_, k) => <Star key={k} className={`h-3 w-3 ${k < r.rating ? "fill-champagne-deep text-champagne-deep" : "text-line"}`} />)}</span>
+              <span className="flex gap-0.5" aria-label={`Nota ${r.rating}`}>{Array.from({ length: 5 }, (_, k) => <Star key={k} className={`h-3 w-3 ${k < r.rating ? "fill-accent-deep text-accent-deep" : "text-line"}`} />)}</span>
             </div>
             <p className="mt-2 text-sm text-stone">“{r.comment}”</p>
             <div className="mt-3 flex gap-4 text-xs">

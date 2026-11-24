@@ -46,12 +46,12 @@ export default async function BookingPage() {
     <div className="min-h-screen bg-cream pb-24 pt-32 md:pt-40">
       <div className="container-luxe">
         <header className="mb-12 max-w-3xl md:mb-16">
-          <p className="eyebrow flex items-center gap-4 text-champagne-deep">
-            <span className="h-px w-10 bg-champagne-deep/50" aria-hidden="true" />
+          <p className="eyebrow flex items-center gap-4 text-accent-deep">
+            <span className="h-px w-10 bg-accent-deep/50" aria-hidden="true" />
             Agendamento online
           </p>
           <h1 className="mt-5 text-[clamp(2.8rem,7vw,5.2rem)] font-light leading-[0.98]">
-            Reserve sua <em className="text-champagne-deep">experiência.</em>
+            Reserve sua <em className="text-accent-deep">experiência.</em>
           </h1>
         </header>
         <Suspense fallback={<WizardSkeleton />}>

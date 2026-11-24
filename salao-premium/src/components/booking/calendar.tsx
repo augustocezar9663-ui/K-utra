@@ -125,17 +125,17 @@ export function Calendar({
                     isSelected
                       ? "bg-ink text-white"
                       : available
-                        ? "bg-cream text-ink hover:bg-champagne"
+                        ? "bg-cream text-ink hover:bg-accent"
                         : "text-ink/25"
                   } ${past ? "line-through decoration-ink/20" : ""}`}
                 >
                   {loading && !past ? <span className="skeleton absolute inset-1 opacity-60" /> : null}
                   <span className="relative">{day}</span>
                   {available && !isSelected ? (
-                    <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-champagne-deep" aria-hidden="true" />
+                    <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-accent-deep" aria-hidden="true" />
                   ) : null}
                   {isToday && !isSelected ? (
-                    <span className="absolute inset-0 border border-champagne-deep/60" aria-hidden="true" />
+                    <span className="absolute inset-0 border border-accent-deep/60" aria-hidden="true" />
                   ) : null}
                 </button>
               );

@@ -20,12 +20,12 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
           <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/55">
             Técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente.
           </p>
-          <Link href="/agendar" className="btn btn-champagne mt-8">
+          <Link href="/agendar" className="btn btn-accent mt-8">
             Agendar experiência
           </Link>
         </div>
         <nav aria-label="Rodapé" className="md:col-span-2">
-          <p className="eyebrow text-champagne">Navegação</p>
+          <p className="eyebrow text-accent">Navegação</p>
           <ul className="mt-6 space-y-3 text-sm text-white/70">
             {NAV_LINKS.map((l) => (
               <li key={l.href}>
@@ -37,7 +37,7 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
           </ul>
         </nav>
         <div className="md:col-span-3">
-          <p className="eyebrow text-champagne">Contato</p>
+          <p className="eyebrow text-accent">Contato</p>
           <ul className="mt-6 space-y-3 text-sm text-white/70">
             {address.hasAddress ? <li>{address.line1}<br />{address.line2}</li> : null}
             {settings.phone ? (
@@ -71,7 +71,7 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
           </ul>
         </div>
         <div className="md:col-span-3">
-          <p className="eyebrow text-champagne">Horários</p>
+          <p className="eyebrow text-accent">Horários</p>
           <ul className="mt-6 space-y-3 text-sm">
             {schedule.map((g) => (
               <li key={g.label} className="flex justify-between gap-4 border-b border-white/10 pb-3">

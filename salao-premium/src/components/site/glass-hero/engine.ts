@@ -2,7 +2,7 @@
  * Motor WebGL da hero "vidro estilhaçado".
  * Inspirado no conceito "Designed in glass": uma página escura cortada em
  * placas grossas de vidro fumê, com o conteúdo impresso nas placas.
- * Adaptado à identidade do salão (carvão quente, champagne, Cormorant) e
+ * Adaptado à identidade do salão (carvão quente, accent, Cormorant) e
  * ao scroll: rolar a página estilhaça as placas e revela o restante do site.
  */
 import * as THREE from "three";
@@ -68,10 +68,10 @@ const easeOutBack = (t: number) => {
 type V2 = { x: number; y: number };
 
 const PALETTE = {
-  glass: 0x1c1915,
-  glow: [0.84, 0.74, 0.58] as const, // champagne
-  key: 0xfff1e2,
-  champagne: "#d6c1a3",
+  glass: 0x111722,
+  glow: [0.32, 0.5, 1.0] as const, // azul
+  key: 0xe8f0ff,
+  accent: "#5b8cff",
 };
 
 /* Padrões de cortes (coordenadas normalizadas do painel: x → direita, y ↓).
@@ -232,9 +232,9 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
       const tw = trackedWidth(ctx, it);
       if (it.role === "primary") {
         const w = it.w!, h = it.h!;
-        ctx.fillStyle = hover.key === "primary" ? "#ffffff" : PALETTE.champagne;
+        ctx.fillStyle = hover.key === "primary" ? "#ffffff" : PALETTE.accent;
         ctx.beginPath(); ctx.roundRect(it.x, it.y, w, h, 2); ctx.fill();
-        ctx.fillStyle = "#111111";
+        ctx.fillStyle = "#07090f";
         drawText(ctx, it, it.x + (w - tw) / 2 + (it.tracking * it.size) / 2, it.y + (h - it.size) / 2 + it.size * 0.06);
         continue;
       }
@@ -251,13 +251,13 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
         continue;
       }
       if (it.role === "h1") {
-        if (it.italic) ctx.fillStyle = PALETTE.champagne;
+        if (it.italic) ctx.fillStyle = PALETTE.accent;
         else {
           const g = ctx.createLinearGradient(0, it.y, 0, it.y + it.size);
-          g.addColorStop(0, "#f4f0ea"); g.addColorStop(1, "#cfc7bb");
+          g.addColorStop(0, "#f2f5fb"); g.addColorStop(1, "#c3cde0");
           ctx.fillStyle = g;
         }
-      } else if (it.key === "eyebrow") ctx.fillStyle = "rgba(214,193,163,.9)";
+      } else if (it.key === "eyebrow") ctx.fillStyle = "rgba(91,140,255,.9)";
       else if (it.role === "small") ctx.fillStyle = "rgba(255,255,255,.36)";
       else ctx.fillStyle = "rgba(255,255,255,.62)";
       const x = it.align === "right" ? it.x - tw : it.x;
@@ -276,7 +276,7 @@ export function createGlassHero(opts: Options): GlassHeroHandle {
     const m = new THREE.MeshPhysicalMaterial({
       color: PALETTE.glass, roughness: 0.36, metalness: 0,
       clearcoat: 0.7, clearcoatRoughness: 0.12, specularIntensity: 0.7,
-      iridescence: 0.5, iridescenceIOR: 1.3, iridescenceThicknessRange: [300, 520],
+      iridescence: 0.5, iridescenceIOR: 1.3, iridescenceThicknessRange: [180, 380],
       envMapIntensity: 1,
       transparent: true,
     });

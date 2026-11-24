@@ -10,8 +10,8 @@ const FORMATTERS: Record<ValueKind, (v: number) => string> = {
   times: (v) => `${v}×`,
 };
 
-/** Série única (sem legenda; o título nomeia a série). Cor validada: #A8772A sobre branco. */
-const BAR = "#A8772A";
+/** Série única (sem legenda; o título nomeia a série). Cor validada: #2F5BD8 sobre branco. */
+const BAR = "#2F5BD8";
 
 export interface BarDatum {
   label: string;
@@ -60,7 +60,7 @@ export function BarChart({
           const y = padT + plotH - (t / max) * plotH;
           return (
             <g key={t}>
-              <line x1={0} x2={W} y1={y} y2={y} stroke="#ECE8E1" strokeWidth={1} />
+              <line x1={0} x2={W} y1={y} y2={y} stroke="#E4E9F2" strokeWidth={1} />
               <text x={0} y={y - 4} fontSize={10} fill="#777">
                 {format(Math.round(t))}
               </text>
@@ -99,7 +99,7 @@ export function BarChart({
             </g>
           );
         })}
-        <line x1={0} x2={W} y1={padT + plotH} y2={padT + plotH} stroke="#D9D3C9" strokeWidth={1} />
+        <line x1={0} x2={W} y1={padT + plotH} y2={padT + plotH} stroke="#CBD3E1" strokeWidth={1} />
       </svg>
       <details className="mt-3 text-xs text-stone">
         <summary className="cursor-pointer">Ver dados em tabela</summary>

@@ -73,7 +73,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
         } ${
           solid && !open
             ? dark
-              ? "bg-[#0d0c0b]/55 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150"
+              ? "bg-[#05070c]/55 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150"
               : "bg-white/75 shadow-[0_1px_0_rgba(17,17,17,0.06)] backdrop-blur-xl backdrop-saturate-150"
             : "bg-transparent"
         }`}
@@ -107,7 +107,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
           <div className="relative z-10 flex items-center gap-3">
             <Link
               href="/agendar"
-              className={`btn hidden min-h-11 px-6 sm:inline-flex ${light ? "btn-champagne" : "btn-primary"}`}
+              className={`btn hidden min-h-11 px-6 sm:inline-flex ${light ? "btn-accent" : "btn-primary"}`}
             >
               Agendar horário
             </Link>
@@ -163,7 +163,7 @@ export function Header({ name, tagline, logoUrl }: { name: string; tagline: stri
                         onClick={() => setOpen(false)}
                         className="flex items-baseline gap-4 py-2 font-serif text-[2.6rem] leading-tight text-ink"
                       >
-                        <span className="eyebrow text-champagne-deep">0{i + 1}</span>
+                        <span className="eyebrow text-accent-deep">0{i + 1}</span>
                         {l.label}
                       </Link>
                     </motion.div>

@@ -13,12 +13,12 @@ export default async function LoginPage() {
         <Artwork seed="admin-login" tone="ink" />
         <div className="absolute bottom-12 left-12 text-white">
           <p className="font-serif text-4xl">{s.name}</p>
-          <p className="eyebrow mt-2 text-champagne">Painel administrativo</p>
+          <p className="eyebrow mt-2 text-accent">Painel administrativo</p>
         </div>
       </div>
       <div className="flex items-center justify-center px-5 py-16">
         <div className="w-full max-w-sm">
-          <p className="eyebrow text-champagne-deep">Acesso restrito</p>
+          <p className="eyebrow text-accent-deep">Acesso restrito</p>
           <h1 className="mt-4 text-5xl font-light">Entrar</h1>
           <p className="mt-3 text-sm text-stone">Use a conta de administrador cadastrada no Supabase.</p>
           <Suspense fallback={<div className="skeleton mt-10 h-64" />}>

@@ -37,7 +37,7 @@ export function ServicesManager({ services }: { services: Service[] }) {
         {services.length === 0 ? <li className="p-6 text-sm text-stone">Nenhum serviço cadastrado.</li> : null}
         {services.map((s, i) => (
           <li key={s.id} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
-            <Media src={s.image_url} alt="" seed={s.slug} tone={(["ink", "sand", "champagne", "cream"] as const)[i % 4]} sizes="80px" className="h-20 w-16 shrink-0" />
+            <Media src={s.image_url} alt="" seed={s.slug} tone={(["ink", "sand", "accent", "cream"] as const)[i % 4]} sizes="80px" className="h-20 w-16 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2 font-serif text-xl">
                 {s.name}

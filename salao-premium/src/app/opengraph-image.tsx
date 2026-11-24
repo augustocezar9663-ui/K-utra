@@ -16,19 +16,19 @@ export default async function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#111111",
+          background: "#05070c",
           color: "#ffffff",
           padding: "72px 80px",
           fontFamily: "serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 20, color: "#D6C1A3", fontSize: 22, letterSpacing: 8 }}>
-          <div style={{ width: 60, height: 1, background: "#D6C1A3" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 20, color: "#5B8CFF", fontSize: 22, letterSpacing: 8 }}>
+          <div style={{ width: 60, height: 1, background: "#5B8CFF" }} />
           {s.name.toUpperCase()}
         </div>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 92, lineHeight: 1, fontWeight: 300 }}>
           <span>SEU ESTILO.</span>
-          <span style={{ color: "#D6C1A3", fontStyle: "italic" }}>Sua identidade.</span>
+          <span style={{ color: "#5B8CFF", fontStyle: "italic" }}>Sua identidade.</span>
           <span>NOSSO CUIDADO.</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 22, color: "#bbbbbb", fontFamily: "sans-serif", letterSpacing: 4 }}>

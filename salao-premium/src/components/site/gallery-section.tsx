@@ -58,16 +58,16 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
             <Reveal>
-              <p className="eyebrow flex items-center gap-4 text-champagne-deep">
+              <p className="eyebrow flex items-center gap-4 text-accent-deep">
                 <span>03</span>
-                <span className="h-px w-10 bg-champagne-deep/50" aria-hidden="true" />
+                <span className="h-px w-10 bg-accent-deep/50" aria-hidden="true" />
                 <span className="text-stone">Galeria</span>
               </p>
             </Reveal>
             <div id="galeria-titulo">
               <RevealLines
                 className="mt-6 text-[clamp(2.4rem,5.6vw,4.6rem)] font-light leading-[1]"
-                lines={["Um portfólio", <em key="e" className="text-champagne-deep">de transformações.</em>]}
+                lines={["Um portfólio", <em key="e" className="text-accent-deep">de transformações.</em>]}
               />
             </div>
           </div>

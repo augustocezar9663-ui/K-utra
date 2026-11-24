@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #111111;
-  --color-ink-soft: #1c1b19;
+  --color-ink: #07090f;
+  --color-ink-soft: #101522;
   --color-paper: #ffffff;
-  --color-cream: #f7f5f2;
-  --color-sand: #ede7de;
-  --color-champagne: #d6c1a3;
-  --color-champagne-deep: #b89b72;
-  --color-stone: #777777;
-  --color-line: #e6e1d9;
+  --color-cream: #eef2f9;
+  --color-sand: #dde5f3;
+  --color-accent: #5b8cff;
+  --color-accent-deep: #1f4fd6;
+  --color-stone: #687083;
+  --color-line: #dde3ee;
 
   --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   --font-sans: var(--font-manrope), "Manrope", system-ui, sans-serif;
@@ -40,11 +40,11 @@
     overflow-x: clip;
   }
   ::selection {
-    background: var(--color-champagne);
+    background: var(--color-accent);
     color: var(--color-ink);
   }
   :focus-visible {
-    outline: 1.5px solid var(--color-champagne-deep);
+    outline: 1.5px solid var(--color-accent-deep);
     outline-offset: 3px;
   }
   h1, h2, h3, h4 {
@@ -110,10 +110,14 @@
   .btn:disabled::before { display: none; }
 
   .btn-primary { background: var(--color-ink); color: var(--color-paper); }
-  .btn-primary::before { background: var(--color-champagne-deep); }
+  .btn-primary::before { background: var(--color-accent-deep); }
 
-  .btn-champagne { background: var(--color-champagne); color: var(--color-ink); }
-  .btn-champagne::before { background: var(--color-paper); }
+  .btn-accent { background: var(--color-accent); color: var(--color-ink); }
+  .btn-accent::before { background: var(--color-paper); }
+
+  .btn-light { background: var(--color-paper); color: var(--color-ink); }
+  .btn-light::before { background: var(--color-ink); }
+  .btn-light:hover { color: var(--color-paper); }
 
   .btn-ghost-light { border: 1px solid rgb(255 255 255 / 0.45); color: var(--color-paper); }
   .btn-ghost-light::before { background: var(--color-paper); }
@@ -153,18 +157,18 @@
     color: var(--color-ink);
     transition: border-color 0.3s, box-shadow 0.3s;
   }
-  .field::placeholder { color: #a9a39a; }
+  .field::placeholder { color: #98a1b3; }
   .field:focus {
     outline: none;
     border-color: var(--color-ink);
-    box-shadow: 0 0 0 3px rgb(214 193 163 / 0.35);
+    box-shadow: 0 0 0 3px rgb(91 140 255 / 0.35);
   }
   .field[aria-invalid="true"] { border-color: #a4473b; }
 
   .hairline { height: 1px; background: var(--color-line); }
 
   .skeleton {
-    background: linear-gradient(90deg, #efebe5 25%, #f7f5f2 50%, #efebe5 75%);
+    background: linear-gradient(90deg, #e6ebf4 25%, #eef2f9 50%, #e6ebf4 75%);
     background-size: 200% 100%;
     animation: var(--animate-shimmer);
   }
@@ -193,9 +197,9 @@ body { transition: background-color 0.2s linear; }
 .glass-text { z-index: 2; }
 .glass-text * { position: absolute; white-space: pre; color: transparent; margin: 0; }
 .glass-text h1 { position: static; font-size: inherit; }
-.glass-text ::selection { background: rgb(214 193 163 / 0.45); color: transparent; }
+.glass-text ::selection { background: rgb(91 140 255 / 0.45); color: transparent; }
 .glass-text .glass-hit { display: block; }
-.glass-text a:focus-visible { outline: 1.5px solid var(--color-champagne); outline-offset: 4px; }
+.glass-text a:focus-visible { outline: 1.5px solid var(--color-accent); outline-offset: 4px; }
 
 /* ---------- Cursor refinado (somente ponteiro fino) ---------- */
 html.has-luxe-cursor, html.has-luxe-cursor * { cursor: none; }

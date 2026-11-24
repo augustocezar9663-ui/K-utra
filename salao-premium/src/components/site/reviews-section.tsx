@@ -10,13 +10,13 @@ const fmt = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric", t
 export function ReviewsSection({ reviews }: { reviews: Review[] }) {
   if (reviews.length === 0) return null;
   return (
-    <section id="depoimentos" aria-labelledby="depoimentos-titulo" data-tone="#f7f5f2" className="py-24 md:py-36">
+    <section id="depoimentos" aria-labelledby="depoimentos-titulo" data-tone="#eef2f9" className="py-24 md:py-36">
       <div className="container-luxe">
         <div id="depoimentos-titulo">
           <SectionHeading
             index="05"
             eyebrow="Depoimentos"
-            lines={["Palavras de quem", <em key="e" className="text-champagne-deep">viveu a experiência.</em>]}
+            lines={["Palavras de quem", <em key="e" className="text-accent-deep">viveu a experiência.</em>]}
           />
         </div>
         <ul className="mt-16 grid gap-6 md:mt-20 md:grid-cols-2 lg:grid-cols-3">
@@ -27,7 +27,7 @@ export function ReviewsSection({ reviews }: { reviews: Review[] }) {
                   {Array.from({ length: 5 }, (_, k) => (
                     <Star
                       key={k}
-                      className={`h-3.5 w-3.5 ${k < r.rating ? "fill-champagne-deep text-champagne-deep" : "text-line"}`}
+                      className={`h-3.5 w-3.5 ${k < r.rating ? "fill-accent-deep text-accent-deep" : "text-line"}`}
                       strokeWidth={1.25}
                       aria-hidden="true"
                     />

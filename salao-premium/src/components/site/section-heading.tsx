@@ -19,9 +19,9 @@ export function SectionHeading({
     <div className={align === "split" ? "grid gap-8 md:grid-cols-12 md:items-end" : "max-w-3xl"}>
       <div className={align === "split" ? "md:col-span-7" : ""}>
         <Reveal>
-          <p className={`eyebrow flex items-center gap-4 ${light ? "text-champagne" : "text-champagne-deep"}`}>
+          <p className={`eyebrow flex items-center gap-4 ${light ? "text-accent" : "text-accent-deep"}`}>
             <span>{index}</span>
-            <span className={`h-px w-10 ${light ? "bg-champagne/60" : "bg-champagne-deep/50"}`} aria-hidden="true" />
+            <span className={`h-px w-10 ${light ? "bg-accent/60" : "bg-accent-deep/50"}`} aria-hidden="true" />
             <span className={light ? "text-white/60" : "text-stone"}>{eyebrow}</span>
           </p>
         </Reveal>

@@ -50,7 +50,7 @@ export function WhatsAppFloat({ number, salonName }: { number: string | null; sa
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-cream"
             >
-              <MessageCircleQuestion className="h-4 w-4 text-champagne-deep" strokeWidth={1.5} />
+              <MessageCircleQuestion className="h-4 w-4 text-accent-deep" strokeWidth={1.5} />
               Tirar uma dúvida
             </a>
             <a
@@ -60,7 +60,7 @@ export function WhatsAppFloat({ number, salonName }: { number: string | null; sa
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-cream"
             >
-              <CalendarCheck className="h-4 w-4 text-champagne-deep" strokeWidth={1.5} />
+              <CalendarCheck className="h-4 w-4 text-accent-deep" strokeWidth={1.5} />
               Solicitar confirmação de horário
             </a>
           </motion.div>
@@ -73,7 +73,7 @@ export function WhatsAppFloat({ number, salonName }: { number: string | null; sa
         aria-label={open ? "Fechar opções do WhatsApp" : "Falar pelo WhatsApp"}
         className="group flex h-14 w-14 items-center justify-center rounded-full bg-ink text-white shadow-[0_14px_40px_-12px_rgba(17,17,17,0.6)] transition-transform duration-500 hover:scale-105"
       >
-        {open ? <X className="h-5 w-5" strokeWidth={1.5} /> : <WhatsAppIcon className="h-6 w-6 text-champagne" />}
+        {open ? <X className="h-5 w-5" strokeWidth={1.5} /> : <WhatsAppIcon className="h-6 w-6 text-accent" />}
       </button>
     </motion.div>
   );

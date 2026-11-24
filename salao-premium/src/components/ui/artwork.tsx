@@ -5,13 +5,13 @@
  * Motivo: fios de cabelo em movimento, em traço fino.
  */
 
-type Tone = "ink" | "cream" | "sand" | "champagne";
+type Tone = "ink" | "cream" | "sand" | "accent";
 
 const PALETTES: Record<Tone, { bg: string; glow: string; line: string; lineOpacity: number }> = {
-  ink: { bg: "#141312", glow: "#3a3128", line: "#D6C1A3", lineOpacity: 0.55 },
-  cream: { bg: "#F7F5F2", glow: "#E9DFD0", line: "#111111", lineOpacity: 0.32 },
-  sand: { bg: "#E8DFD2", glow: "#F7F1E8", line: "#6b5a45", lineOpacity: 0.4 },
-  champagne: { bg: "#CDB693", glow: "#E9DBC4", line: "#2a241d", lineOpacity: 0.38 },
+  ink: { bg: "#070a12", glow: "#1a2a55", line: "#5B8CFF", lineOpacity: 0.55 },
+  cream: { bg: "#EEF2F9", glow: "#DCE6FB", line: "#07090f", lineOpacity: 0.3 },
+  sand: { bg: "#DDE5F3", glow: "#F4F7FD", line: "#1F3A78", lineOpacity: 0.38 },
+  accent: { bg: "#1F4FD6", glow: "#5B8CFF", line: "#EAF0FF", lineOpacity: 0.42 },
 };
 
 function hash(str: string) {
@@ -89,7 +89,7 @@ export function Artwork({
       {label ? (
         <span
           className="eyebrow absolute bottom-5 left-5 opacity-70"
-          style={{ color: tone === "ink" ? "#D6C1A3" : "#111111" }}
+          style={{ color: tone === "ink" ? "#5B8CFF" : tone === "accent" ? "#EAF0FF" : "#07090f" }}
         >
           {label}
         </span>
