@@ -17,8 +17,8 @@ import type {
 
 export const DEFAULT_SETTINGS: BusinessSettings = {
   id: 1,
-  name: "Atelier Aurea",
-  tagline: "Hair Atelier",
+  name: "Seu Nome",
+  tagline: "Corte masculino",
   logo_url: null,
   hero_image_url: null,
   about_image_url: null,

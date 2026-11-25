@@ -10,7 +10,7 @@ export default async function GalleryPage() {
   const { data } = await supabase.from("gallery_images").select("*").order("sort_order").order("created_at");
   return (
     <>
-      <PageHeader title="Galeria" description="Fotografias de trabalhos realizados no salão. Use imagens próprias, em alta resolução (mínimo 1600px no lado maior)." />
+      <PageHeader title="Galeria" description="Fotos dos seus trabalhos. Use imagens próprias, em alta resolução (mínimo 1600px no lado maior)." />
       <GalleryManager images={(data ?? []) as GalleryImage[]} />
     </>
   );

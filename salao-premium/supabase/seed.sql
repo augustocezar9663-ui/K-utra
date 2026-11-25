@@ -1,16 +1,19 @@
 -- =====================================================================
 --  Dados iniciais (configuração). Preços e durações são valores
 --  INICIAIS DE EXEMPLO — edite-os no painel em /admin/servicos.
---  Nenhum depoimento, profissional ou número de clientes é criado aqui.
+--  Site PESSOAL: cria um único profissional (o dono do site), por isso o
+--  agendamento não mostra a etapa "Profissional". Nenhum depoimento ou
+--  número de clientes é criado aqui.
 -- =====================================================================
 
--- Telefone e WhatsApp do salão: (69) 9608-1567 (somente dígitos, com DDD).
+-- "Seu Nome" é um marcador: troque pelo seu nome em /admin/configuracoes.
+-- Telefone e WhatsApp: (69) 9608-1567 (somente dígitos, com DDD).
 insert into public.business_settings (id, name, tagline, description, cancellation_policy, phone, whatsapp)
 values (
   1,
-  'Atelier Aurea',
-  'Hair Atelier',
-  'Cada detalhe importa. Nosso propósito é proporcionar uma experiência única, unindo técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente.',
+  'Seu Nome',
+  'Corte masculino',
+  'Cada detalhe importa. Meu propósito é proporcionar uma experiência única, unindo técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente.',
   'Cancelamentos e reagendamentos podem ser solicitados com até 24 horas de antecedência pelo WhatsApp. Atrasos superiores a 15 minutos podem exigir reagendamento.',
   '6996081567',
   '6996081567'
@@ -63,3 +66,18 @@ select v.image_url, v.alt, v.category, v.sort_order
     ('/galeria/mullet-burst-fade.jpg',         'Mullet moderno com burst fade ao redor da orelha',                                  'Mullet',   4)
   ) as v(image_url, alt, category, sort_order)
  where not exists (select 1 from public.gallery_images g where g.image_url = v.image_url);
+
+-- O dono do site: um único profissional que realiza todos os serviços.
+-- Só é criado se ainda não houver nenhum profissional. Com um profissional
+-- só, o agendamento pula a etapa "Profissional" e mostra ao cliente o nome
+-- cadastrado em Configurações. Rode o seed de novo depois de criar serviços
+-- para vinculá-los (ou marque-os em /admin/profissionais).
+insert into public.professionals (slug, name, sort_order)
+select 'agenda-principal', 'Agenda principal', 1
+ where not exists (select 1 from public.professionals);
+
+insert into public.professional_services (professional_id, service_id)
+select p.id, s.id
+  from public.professionals p cross join public.services s
+ where p.slug = 'agenda-principal' and s.is_active
+on conflict do nothing;

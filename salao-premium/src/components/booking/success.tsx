@@ -99,9 +99,9 @@ export function BookingSuccess({
         </h2>
         <p className="mx-auto mt-5 max-w-md text-stone">
           {pending
-            ? "O horário já está bloqueado na nossa agenda e aguarda a confirmação da equipe do salão."
-            : "Seu horário foi confirmado na nossa agenda."}
-          {result.emailSent ? " Enviamos os detalhes para o seu e-mail." : ""}
+            ? "O horário já está bloqueado na minha agenda e aguarda a minha confirmação."
+            : "Seu horário foi confirmado na minha agenda."}
+          {result.emailSent ? " Os detalhes foram enviados para o seu e-mail." : ""}
         </p>
 
         <div className="mt-10 border border-line bg-white p-6 text-left sm:p-8">
@@ -130,7 +130,7 @@ export function BookingSuccess({
           {wa ? (
             <a href={wa} target="_blank" rel="noopener noreferrer" className="btn btn-primary sm:col-span-2">
               <WhatsAppIcon className="h-4 w-4 text-accent" />
-              {pending ? "Solicitar confirmação no WhatsApp" : "Falar com o salão no WhatsApp"}
+              {pending ? "Solicitar confirmação no WhatsApp" : "Falar comigo no WhatsApp"}
             </a>
           ) : null}
           <button type="button" onClick={downloadIcs} className="btn btn-outline">

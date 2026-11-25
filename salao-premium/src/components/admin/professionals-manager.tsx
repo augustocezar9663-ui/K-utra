@@ -59,7 +59,7 @@ export function ProfessionalsManager({ professionals, services, hours }: Props) 
                 <p className="font-serif text-xl leading-tight">{p.name}</p>
                 <p className="text-xs text-stone">{p.specialty ?? "—"}</p>
                 <p className="mt-2 text-xs text-stone">
-                  {p.service_ids.length} serviço(s) · {custom ? "jornada própria" : "horário do salão"}
+                  {p.service_ids.length} serviço(s) · {custom ? "jornada própria" : "horário geral"}
                   {!p.is_active ? " · inativo" : ""}
                 </p>
                 <div className="mt-3 flex gap-4">
@@ -172,12 +172,12 @@ function ProfessionalForm({
             onChange={(e) => setCustom(e.target.checked)}
             className="h-4 w-4 accent-ink"
           />
-          Definir jornada individual (sempre limitada ao horário de funcionamento do salão)
+          Definir jornada individual (sempre limitada ao horário de atendimento geral)
         </label>
         {custom ? (
           <HoursEditor initial={ownHours.length ? ownHours : salonHours} />
         ) : (
-          <p className="text-sm text-stone">Segue o horário de funcionamento do salão. Folgas e férias são cadastradas em “Bloqueios e feriados”.</p>
+          <p className="text-sm text-stone">Segue o horário de atendimento definido em Configurações. Folgas e férias são cadastradas em “Bloqueios e feriados”.</p>
         )}
       </fieldset>
 

@@ -1,11 +1,11 @@
-# Atelier Aurea — Plataforma de agendamento para salão
+# Site pessoal com agendamento — corte masculino
 
-Site institucional premium + agendamento online + painel administrativo para salão de corte masculino.
+Site pessoal premium + agendamento online + painel administrativo para um **profissional de corte masculino que atende em um salão**. O site fala em primeira pessoa ("meu cuidado", "espero por você") e a agenda é a desse profissional.
 
 **Stack:** Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Motion · Lucide · Supabase (Postgres, Auth, Storage) · Zod.
 
-> O nome "Atelier Aurea", os preços e as durações são **valores iniciais editáveis** no painel.
-> Nenhum depoimento, profissional ou número de clientes é inventado: essas seções só exibem o que o administrador cadastrar.
+> O nome exibido começa como **"Seu Nome"** (marcador): troque em *Painel → Configurações*. Preços, durações e horário de atendimento também são **valores iniciais editáveis**.
+> Nenhum depoimento ou número de clientes é inventado: essas seções só exibem o que for cadastrado no painel.
 
 ---
 
@@ -22,20 +22,21 @@ Site institucional premium + agendamento online + painel administrativo para sal
 - SEO: metadata, Open Graph com imagem gerada, `sitemap.xml`, `robots.txt`, JSON-LD `HairSalon`, página 404 e página de erro.
 - Acessibilidade: `prefers-reduced-motion` respeitado em todas as animações, foco visível, link "pular para o conteúdo", labels/aria nos formulários, alvos de toque ≥ 44px.
 
-**Agendamento (`/agendar`)** — 6 etapas
-1. Serviços (múltipla escolha; só permite combinar serviços que algum profissional realize juntos)
-2. Profissional ou "primeira disponibilidade"
-3. Calendário (dias passados bloqueados; dias com horário livre destacados; feriados/bloqueios respeitados)
-4. Horários em tempo real, considerando a duração somada dos serviços
-5. Dados do cliente (validação com Zod no cliente **e** no servidor; anti-spam honeypot)
-6. Revisão → confirmação → tela de sucesso com código único (`AU-XXXXXX`), WhatsApp com mensagem pronta, `.ics` e Google Agenda, e e-mail (se o Resend estiver configurado)
+**Agendamento (`/agendar`)** — 5 etapas (com um profissional só, a escolha de profissional não aparece)
+1. Serviços (múltipla escolha)
+2. Calendário (dias passados bloqueados; dias com horário livre destacados; feriados/folgas respeitados)
+3. Horários em tempo real, considerando a duração somada dos serviços
+4. Dados do cliente (validação com Zod no cliente **e** no servidor; anti-spam honeypot)
+5. Revisão → confirmação → tela de sucesso com código único (`AU-XXXXXX`), WhatsApp com mensagem pronta, `.ics` e Google Agenda, e e-mail (se o Resend estiver configurado)
+
+Se um dia outro profissional for cadastrado em *Profissionais*, a etapa "Profissional" (com "primeira disponibilidade") volta sozinha.
 
 **Garantia contra conflitos:** a confirmação chama a função `book_appointment` no Postgres, que revalida tudo (serviços ativos, antecedência, grade, funcionamento do salão, jornada do profissional, bloqueios) e grava sob uma **constraint de exclusão** (`appointments_no_overlap`). Duas reservas simultâneas para o mesmo profissional/horário: só uma é gravada — testado com 12 conexões concorrentes.
 
 **Painel (`/admin`)** — protegido por login + papel `admin` (proxy + verificação no servidor + RLS no banco)
 - Dashboard: total, agendamentos do dia, pendentes, faturamento registrado (atendimentos concluídos), gráfico por dia, faturamento por mês, serviços mais procurados, próximos atendimentos.
 - Agendamentos: filtros (hoje / próximos / histórico / data / status), busca por nome, telefone ou código, confirmar, concluir, não compareceu, cancelar, reativar, reagendar (com bloqueio de conflito), WhatsApp para o cliente e histórico completo (auditoria automática por trigger).
-- Serviços, Profissionais (foto, especialidade, serviços realizados, jornada individual), Bloqueios e feriados, Galeria, Avaliações e Configurações (dados do salão, logo, foto principal, endereço, contatos, redes, horários de funcionamento, dias de atendimento, grade, antecedência, confirmação automática, política de cancelamento).
+- Serviços, Profissionais (a sua agenda: serviços realizados e jornada; aceita outras pessoas no futuro), Bloqueios e feriados, Galeria, Avaliações e Configurações (seu nome, assinatura, logo, foto principal, endereço do salão onde atende, contatos, redes, horário de atendimento, dias de atendimento, grade, antecedência, confirmação automática, política de cancelamento).
 
 ---
 
@@ -91,7 +92,6 @@ salao-premium/
 │   ├── migrations/0003_rls.sql       Row Level Security
 │   ├── migrations/0004_storage.sql   bucket "media" + políticas
 │   ├── seed.sql                      configurações e serviços iniciais
-│   └── demo.sql                      (opcional) 2 profissionais de exemplo
 └── src/
     ├── proxy.ts                      renova sessão e protege /admin
     ├── app/(site)/                   home e /agendar

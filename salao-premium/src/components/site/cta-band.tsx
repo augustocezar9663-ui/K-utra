@@ -11,7 +11,7 @@ export function CtaBand() {
         />
         <Reveal delay={0.2} className="flex flex-col gap-4 md:items-end">
           <p className="max-w-sm text-white/85 md:text-right">
-            Escolha o serviço, o profissional e o horário ideal em poucos passos.
+            Escolha o serviço e o melhor horário em poucos passos.
           </p>
           <Link href="/agendar" className="btn btn-light">
             Agendar experiência

@@ -24,7 +24,12 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString(hairSalonJsonLd(settings, hours, services)) }}
       />
-      <GlassHero imageUrl={settings.hero_image_url} name={settings.name} city={settings.address_city} />
+      <GlassHero
+        imageUrl={settings.hero_image_url}
+        name={settings.name}
+        tagline={settings.tagline}
+        city={settings.address_city}
+      />
       <ServicesSection services={services} />
       <GallerySection images={gallery} instagramUrl={instagramLink(settings.instagram)} />
       <AboutSection />

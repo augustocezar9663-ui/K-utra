@@ -26,7 +26,7 @@ export function SettingsForm({ s }: { s: BusinessSettings }) {
       <section className="border border-line bg-white p-5 sm:p-7">
         <h2 className="mb-5 text-2xl">Identidade</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input name="name" label="Nome do salão *" defaultValue={s.name} state={state} required />
+          <Input name="name" label="Nome exibido no site *" defaultValue={s.name} state={state} required />
           <Input name="tagline" label="Assinatura (abaixo do nome)" defaultValue={s.tagline} state={state} maxLength={40} />
           <div className="sm:col-span-2">
             <label className="field-label" htmlFor="s-description">Descrição (SEO e dados estruturados)</label>
@@ -40,7 +40,7 @@ export function SettingsForm({ s }: { s: BusinessSettings }) {
       </section>
 
       <section className="border border-line bg-white p-5 sm:p-7">
-        <h2 className="mb-5 text-2xl">Endereço</h2>
+        <h2 className="mb-5 text-2xl">Onde atendo (endereço do salão)</h2>
         <div className="grid gap-4 sm:grid-cols-6">
           <Input name="address_street" label="Rua / Avenida" defaultValue={s.address_street} state={state} className="sm:col-span-4" />
           <Input name="address_number" label="Número" defaultValue={s.address_number} state={state} className="sm:col-span-2" />
@@ -85,7 +85,7 @@ export function ScheduleForm({ s, hours }: { s: BusinessSettings; hours: Working
   const [state, action] = useActionState(saveScheduleRules, initialState);
   return (
     <ActionForm action={action} className="space-y-6 border border-line bg-white p-5 sm:p-7">
-      <h2 className="text-2xl">Horário de funcionamento e regras da agenda</h2>
+      <h2 className="text-2xl">Horário de atendimento e regras da agenda</h2>
       <HoursEditor initial={hours.filter((h) => h.professional_id === null)} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>

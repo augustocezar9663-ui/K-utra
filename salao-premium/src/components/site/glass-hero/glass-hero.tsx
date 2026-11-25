@@ -13,7 +13,17 @@ const EASE = [0.23, 1, 0.32, 1] as const;
  * usuário prefere movimento reduzido / não há WebGL), mostra a versão
  * estática renderizada no servidor — o mesmo conteúdo, com SEO completo.
  */
-export function GlassHero({ name, city, imageUrl }: { name: string; city: string | null; imageUrl: string | null }) {
+export function GlassHero({
+  name,
+  tagline,
+  city,
+  imageUrl,
+}: {
+  name: string;
+  tagline: string;
+  city: string | null;
+  imageUrl: string | null;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
@@ -25,14 +35,14 @@ export function GlassHero({ name, city, imageUrl }: { name: string; city: string
 
   const copy: HeroCopy = {
     eyebrow: (city ? `Corte masculino em ${city}` : "Corte masculino com hora marcada").toUpperCase(),
-    lines: [{ text: "SEU ESTILO." }, { text: "Sua identidade.", italic: true }, { text: "NOSSO CUIDADO." }],
+    lines: [{ text: "SEU ESTILO." }, { text: "Sua identidade.", italic: true }, { text: "MEU CUIDADO." }],
     sub: ["Uma experiência de beleza exclusiva, pensada para valorizar", "sua personalidade e transformar seu visual."],
     primary: "AGENDAR EXPERIÊNCIA",
     secondary: "CONHECER SERVIÇOS",
-    footLeft: "HAIR ATELIER",
+    footLeft: tagline.toUpperCase(),
     footRight: "ROLE PARA DESCOBRIR",
   };
-  const copyKey = copy.eyebrow;
+  const copyKey = `${copy.eyebrow}|${copy.footLeft}`;
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
   useMotionValueEvent(scrollYProgress, "change", (v) => engineRef.current?.setScroll(v));
@@ -206,7 +216,7 @@ function StaticHero({
     >
       <div className="absolute inset-0">
         {imageUrl ? (
-          <Image src={imageUrl} alt={`Ambiente do ${name}`} fill preload sizes="100vw" quality={80} className="object-cover" />
+          <Image src={imageUrl} alt={name} fill preload sizes="100vw" quality={80} className="object-cover" />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(60%_55%_at_72%_28%,rgb(31_79_214/0.32),transparent_70%)]" />
         )}
@@ -220,7 +230,7 @@ function StaticHero({
         <h1 className="max-w-5xl text-[clamp(2.9rem,9vw,7.6rem)] font-light uppercase leading-[0.92] tracking-[-0.015em]">
           <span className="block">Seu estilo.</span>
           <span className="block italic normal-case text-accent">Sua identidade.</span>
-          <span className="block">Nosso cuidado.</span>
+          <span className="block">Meu cuidado.</span>
         </h1>
         <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:items-end">
           <p className="max-w-md text-base leading-relaxed text-white/75 md:col-span-5 md:text-lg">

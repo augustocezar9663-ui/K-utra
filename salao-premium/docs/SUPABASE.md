@@ -14,8 +14,7 @@ No painel do projeto, abra **SQL Editor** → **New query** e execute, **nesta o
 2. `supabase/migrations/0002_booking.sql`
 3. `supabase/migrations/0003_rls.sql`
 4. `supabase/migrations/0004_storage.sql`
-5. `supabase/seed.sql` — configurações iniciais, horário de funcionamento (ter–sáb, 09h–19h) e o catálogo de corte masculino (9 serviços com preços de exemplo: corte, corte + barba, barba, acabamento, coloração, platinado, pigmentação, hidratação e sobrancelha). Se você já tinha rodado uma versão antiga, rodar de novo desativa os exemplos femininos antigos sem tocar no que foi personalizado
-6. *(opcional)* `supabase/demo.sql` — 2 profissionais marcados como "(exemplo)" para testar o agendamento. **Remova-os** em `/admin/profissionais` antes de publicar.
+5. `supabase/seed.sql` — configurações iniciais (nome "Seu Nome" para trocar), horário de atendimento (ter–sáb, 09h–19h), o **profissional único** (a sua agenda, ligada a todos os serviços), as 4 fotos da galeria e o catálogo de corte masculino (9 serviços com preços de exemplo: corte, corte + barba, barba, acabamento, coloração, platinado, pigmentação, hidratação e sobrancelha). Se você já tinha rodado uma versão antiga, rodar de novo desativa os exemplos femininos antigos sem tocar no que foi personalizado
 
 > Alternativa com a CLI: `supabase link --project-ref <ref>` e `supabase db push` (aplica as migrations); depois rode `seed.sql` no SQL Editor.
 
@@ -48,13 +47,13 @@ Acesse `/admin/login` com esse e-mail e senha.
 
 ## 5. Primeiros passos no painel
 
-1. **Configurações** → nome, logo, fotos, endereço, telefone, WhatsApp (com DDD, ex.: `11999999999`), Instagram, horários de funcionamento, intervalo da grade, antecedência mínima e política de cancelamento.
+1. **Configurações** → **seu nome** (substitua "Seu Nome"), assinatura, logo, endereço do salão onde você atende, telefone, WhatsApp (com DDD, ex.: `11999999999`), Instagram, horários de funcionamento, intervalo da grade, antecedência mínima e política de cancelamento.
 2. **Serviços** → ajuste preços, durações e descrições.
-3. **Profissionais** → cadastre a equipe, marque os serviços que cada um realiza e, se necessário, a jornada individual.
+3. **Profissionais** → já existe a sua agenda ("Agenda principal"), ligada a todos os serviços. Ao criar um serviço novo, marque-o nela. Só cadastre outra pessoa se ela também for atender por este site (aí a escolha de profissional volta ao agendamento).
 4. **Bloqueios e feriados** → cadastre feriados, folgas e férias.
 5. **Galeria** e **Avaliações** → conteúdo real do salão.
 
-Sem pelo menos um profissional ativo vinculado aos serviços, o agendamento online mostra que não há horários disponíveis.
+Sem um profissional ativo vinculado aos serviços (a "Agenda principal" criada pelo seed), o agendamento online mostra que não há horários disponíveis.
 
 ## Como funciona a proteção contra horários duplicados
 
@@ -66,7 +65,7 @@ Sem pelo menos um profissional ativo vinculado aos serviços, o agendamento onli
 ## E-mail de confirmação (opcional)
 
 1. Crie uma conta no [Resend](https://resend.com), verifique seu domínio e gere uma API key.
-2. Preencha `RESEND_API_KEY`, `EMAIL_FROM` (ex.: `Atelier Aurea <agenda@seusalao.com.br>`) e, se quiser receber cópia de cada agendamento, `ADMIN_NOTIFICATION_EMAIL`.
+2. Preencha `RESEND_API_KEY`, `EMAIL_FROM` (ex.: `Seu Nome <agenda@seudominio.com.br>`) e, se quiser receber cópia de cada agendamento, `ADMIN_NOTIFICATION_EMAIL`.
 3. O cliente recebe e-mail apenas se informar o endereço; a tela de sucesso só diz "enviamos para o seu e-mail" quando o Resend aceitou o envio.
 
 ## Backup e privacidade

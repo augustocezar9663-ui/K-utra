@@ -28,7 +28,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
             </div>
             <Reveal delay={0.15}>
               <p className="mt-6 max-w-sm text-base leading-relaxed text-stone">
-                Cada atendimento começa com uma conversa. Entendemos sua rotina, seu estilo e o que você deseja sentir
+                Cada atendimento começa com uma conversa. Entendo sua rotina, seu estilo e o que você deseja sentir
                 ao se olhar no espelho.
               </p>
             </Reveal>
@@ -37,7 +37,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
 
         {services.length === 0 ? (
           <p className="border-t border-line pt-8 text-stone lg:col-span-7">
-            Os serviços estão sendo atualizados. Fale conosco pelo WhatsApp para mais informações.
+            Os serviços estão sendo atualizados. Fale comigo pelo WhatsApp para mais informações.
           </p>
         ) : (
           <ul className="border-t border-line lg:col-span-7">

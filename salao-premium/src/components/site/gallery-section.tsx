@@ -96,7 +96,7 @@ export function GallerySection({ images, instagramUrl }: { images: GalleryImage[
         {images.length === 0 ? (
           <div className="mt-16 flex flex-col items-start gap-6 border-t border-white/15 pt-10 md:flex-row md:items-center md:justify-between">
             <p className="max-w-lg text-white/70">
-              Nosso portfólio está sendo preparado com fotografias dos trabalhos realizados no salão.
+              Meu portfólio está sendo preparado com fotos dos meus trabalhos.
             </p>
             {instagramUrl ? (
               <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="btn btn-ghost-light">

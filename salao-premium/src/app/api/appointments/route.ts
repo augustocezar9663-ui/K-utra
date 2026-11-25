@@ -88,7 +88,12 @@ export async function POST(request: NextRequest) {
 
   const [settings, services, professionals] = await Promise.all([getSettings(), getServices(), getProfessionals()]);
   const serviceNames = serviceIds.map((id) => services.find((s) => s.id === id)?.name ?? "Serviço");
-  const professionalName = professionals.find((p) => p.id === data.professional_id)?.name ?? data.professional_name;
+  // Site pessoal (um profissional só): o nome mostrado ao cliente é o nome
+  // do site, que o dono edita em Configurações.
+  const professionalName =
+    professionals.length === 1
+      ? settings.name
+      : (professionals.find((p) => p.id === data.professional_id)?.name ?? data.professional_name);
 
   const emailSent = await sendBookingEmails({
     to: customer.email,

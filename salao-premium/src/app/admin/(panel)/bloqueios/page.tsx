@@ -14,7 +14,7 @@ export default async function BlocksPage() {
   ]);
   return (
     <>
-      <PageHeader title="Bloqueios e feriados" description="Feriados e fechamentos do salão, folgas e férias de profissionais. Horários bloqueados não aparecem no agendamento e são recusados pelo servidor." />
+      <PageHeader title="Bloqueios e feriados" description="Feriados, folgas e férias. Horários bloqueados não aparecem no agendamento e são recusados pelo servidor." />
       <BlocksManager blocks={(blocks ?? []) as BlockedTime[]} professionals={(pros ?? []) as { id: string; name: string }[]} timezone={(s?.timezone as string) ?? "America/Sao_Paulo"} />
     </>
   );

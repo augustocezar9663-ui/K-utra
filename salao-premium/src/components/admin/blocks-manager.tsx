@@ -24,7 +24,7 @@ export function BlocksManager({ blocks, professionals, timezone }: { blocks: Blo
         <div>
           <label className="field-label" htmlFor="b-pro">Aplica-se a</label>
           <select id="b-pro" name="professional_id" className="field">
-            <option value="">Salão inteiro (feriado, evento, manutenção)</option>
+            <option value="">Agenda inteira (feriado, folga, férias)</option>
             {professionals.map((p) => <option key={p.id} value={p.id}>{p.name} (folga, férias)</option>)}
           </select>
         </div>
@@ -69,7 +69,7 @@ export function BlocksManager({ blocks, professionals, timezone }: { blocks: Blo
           {blocks.map((b) => (
             <li key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
               <div>
-                <p className="text-sm font-medium">{b.professional_id ? professionals.find((p) => p.id === b.professional_id)?.name ?? "Profissional" : "Salão inteiro"}</p>
+                <p className="text-sm font-medium">{b.professional_id ? professionals.find((p) => p.id === b.professional_id)?.name ?? "Profissional" : "Agenda inteira"}</p>
                 <p className="text-sm text-stone">{fmt.format(new Date(b.starts_at))} → {fmt.format(new Date(b.ends_at))}</p>
                 {b.reason ? <p className="text-xs text-stone">{b.reason}</p> : null}
               </div>

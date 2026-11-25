@@ -55,10 +55,10 @@ export async function sendBookingEmails(e: ConfirmationEmail): Promise<boolean> 
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 16px"><tr><td align="center">
   <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;padding:48px 40px">
     <tr><td style="font-family:Georgia,serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#777">${esc(e.settings.name)}</td></tr>
-    <tr><td style="padding-top:24px;font-family:Georgia,serif;font-size:30px;line-height:1.2">${e.pending ? "Recebemos seu agendamento" : "Agendamento confirmado"}</td></tr>
+    <tr><td style="padding-top:24px;font-family:Georgia,serif;font-size:30px;line-height:1.2">${e.pending ? "Agendamento recebido" : "Agendamento confirmado"}</td></tr>
     <tr><td style="padding-top:16px;font-size:15px;line-height:1.6;color:#555">Olá, ${esc(e.customerName.split(" ")[0])}. ${
       e.pending
-        ? "Sua solicitação foi registrada e será confirmada pela nossa equipe."
+        ? "Sua solicitação foi registrada e será confirmada em breve."
         : "Está tudo pronto para receber você."
     }</td></tr>
     <tr><td style="padding-top:32px"><table width="100%" cellpadding="0" cellspacing="0">${rows

@@ -38,7 +38,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
       {/* sem endereço cadastrado não há mapa: título e contatos lado a lado */}
       <div className={map ? "container-luxe" : "container-luxe grid gap-10 lg:grid-cols-12"}>
         <div id="contato-titulo" className={map ? "" : "lg:col-span-5"}>
-          <SectionHeading align="stack" lines={["Esperamos por você,", "com hora marcada."]} />
+          <SectionHeading align="stack" lines={["Espero por você,", "com hora marcada."]} />
         </div>
 
         <div className={map ? "mt-12 grid gap-10 md:mt-16 lg:grid-cols-12" : "lg:col-span-7"}>
@@ -48,7 +48,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
                 <div className="py-6">
                   <dt className="label flex items-center gap-3 text-stone">
                     <MapPin className="h-4 w-4 shrink-0 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
-                    Endereço
+                    Onde atendo
                   </dt>
                   <dd className="mt-2 pl-7 text-lg leading-snug">
                     {address.line1}
@@ -101,7 +101,7 @@ export function ContactSection({ settings, hours }: { settings: BusinessSettings
               <div className="py-6">
                 <dt className="label flex items-center gap-3 text-stone">
                   <Clock className="h-4 w-4 shrink-0 text-accent-deep" strokeWidth={1.5} aria-hidden="true" />
-                  Horário de funcionamento
+                  Horário de atendimento
                 </dt>
                 <dd className="mt-3 pl-7 space-y-2">
                   {schedule.map((g) => (

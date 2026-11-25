@@ -20,7 +20,7 @@ export function AboutSection() {
         <div className="lg:col-span-7">
           <ScrollWords
             className="text-xl leading-relaxed text-ink md:text-[1.35rem]"
-            text="Cada detalhe importa. Nosso propósito é proporcionar uma experiência única, unindo técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente."
+            text="Cada detalhe importa. Meu propósito é proporcionar uma experiência única, unindo técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente."
           />
           <ul className="mt-10 grid gap-6 border-t border-line pt-8 sm:grid-cols-3">
             {PILLARS.map((p, i) => (

@@ -29,7 +29,7 @@ export default async function OpengraphImage() {
         <div style={{ display: "flex", flexDirection: "column", fontSize: 92, lineHeight: 1, fontWeight: 300 }}>
           <span>SEU ESTILO.</span>
           <span style={{ color: "#5B8CFF", fontStyle: "italic" }}>Sua identidade.</span>
-          <span>NOSSO CUIDADO.</span>
+          <span>MEU CUIDADO.</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 22, color: "#bbbbbb", fontFamily: "sans-serif", letterSpacing: 4 }}>
           <span>AGENDAMENTO ONLINE</span>

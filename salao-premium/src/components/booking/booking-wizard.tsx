@@ -56,7 +56,12 @@ export function BookingWizard({
     const s = services.find((x) => x.slug === slug);
     return s ? [s.id] : [];
   });
+  // Site pessoal: com um único profissional ativo a agenda é sempre a dele,
+  // e a etapa "Profissional" some do fluxo (volta sozinha se houver 2+).
+  const solo = professionals.length === 1 ? professionals[0] : null;
+  const flow = solo ? [0, 2, 3, 4, 5] : [0, 1, 2, 3, 4, 5];
   const [chosenProfessionalId, setProfessionalId] = useState<string | null>(() => {
+    if (solo) return solo.id;
     const p = params.get("profissional");
     return professionals.some((x) => x.id === p) ? p : null;
   });
@@ -196,7 +201,7 @@ export function BookingWizard({
   }
 
   const canContinue = [
-    serviceIds.length > 0,
+    serviceIds.length > 0 && (!solo || eligible.length > 0),
     eligible.length > 0,
     Boolean(date),
     Boolean(slot),
@@ -206,7 +211,7 @@ export function BookingWizard({
 
   function next() {
     if (step === 4 && !validateCustomer()) return;
-    if (canContinue) goTo(step + 1);
+    if (canContinue) goTo(flow[flow.indexOf(step) + 1]);
   }
 
   async function confirm() {
@@ -257,7 +262,7 @@ export function BookingWizard({
   function reset() {
     setResult(null);
     setServiceIds([]);
-    setProfessionalId(null);
+    setProfessionalId(solo?.id ?? null);
     setCustomer(EMPTY_CUSTOMER);
     setSameWhatsapp(true);
     setErrors({});
@@ -271,7 +276,7 @@ export function BookingWizard({
         <p className="label text-accent-deep">Em breve</p>
         <h2 className="mt-4 text-4xl font-light">Agendamento online em configuração</h2>
         <p className="mt-4 text-stone">
-          Enquanto isso, fale com a nossa equipe para reservar o seu horário.
+          Enquanto isso, fale comigo pelo WhatsApp para reservar o seu horário.
         </p>
         <Link href="/#contato" className="btn btn-primary mt-8">
           Ver contatos
@@ -305,7 +310,7 @@ export function BookingWizard({
   return (
     <div ref={topRef} className="grid gap-10 lg:grid-cols-12 lg:gap-14">
       <div className="lg:col-span-8">
-        <Progress step={step} onJump={(i) => i < step && goTo(i)} />
+        <Progress step={step} flow={flow} onJump={(i) => i < step && goTo(i)} />
 
         <div className="relative mt-10 min-h-[420px] overflow-x-clip">
           <AnimatePresence mode="wait" custom={dir} initial={false}>
@@ -505,7 +510,7 @@ export function BookingWizard({
                     </div>
                   )}
                   <p className="mt-6 text-xs text-stone">
-                    Horários calculados para {formatDuration(totalDuration)} de atendimento, no fuso do salão.
+                    Horários calculados para {formatDuration(totalDuration)} de atendimento, no horário local.
                   </p>
                 </StepShell>
               )}
@@ -620,7 +625,7 @@ export function BookingWizard({
                         ["Cliente", customer.name.trim()],
                         ["Contato", `${customer.phone}${customer.email ? ` · ${customer.email}` : ""}`],
                         ["Serviço(s)", selected.map((s) => s.name).join(", ")],
-                        ["Profissional", professional?.name ?? "Primeira disponibilidade"],
+                        ...(solo ? [] : [["Profissional", professional?.name ?? "Primeira disponibilidade"]]),
                         ["Data", formatDateLong(slot.startsAt, tz)],
                         ["Horário", slot.time],
                         ["Duração estimada", formatDuration(totalDuration)],
@@ -668,7 +673,7 @@ export function BookingWizard({
         <div className="mt-10 flex items-center justify-between gap-4 border-t border-line pt-6">
           <button
             type="button"
-            onClick={() => goTo(step - 1)}
+            onClick={() => goTo(flow[Math.max(0, flow.indexOf(step) - 1)])}
             disabled={step === 0}
             className="flex min-h-11 items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-stone transition-colors hover:text-ink disabled:invisible"
           >
@@ -710,7 +715,13 @@ export function BookingWizard({
             </AnimatePresence>
           </ul>
           <dl className="space-y-3 py-6 text-sm">
-            <SummaryRow icon={<User className="h-3.5 w-3.5" />} label="Profissional" value={step >= 1 ? professional?.name ?? "Primeira disponibilidade" : "—"} />
+            {solo ? null : (
+              <SummaryRow
+                icon={<User className="h-3.5 w-3.5" />}
+                label="Profissional"
+                value={step >= 1 ? (professional?.name ?? "Primeira disponibilidade") : "—"}
+              />
+            )}
             <SummaryRow icon={<Clock className="h-3.5 w-3.5" />} label="Duração" value={totalDuration ? formatDuration(totalDuration) : "—"} />
             <SummaryRow
               label="Data"
@@ -732,15 +743,16 @@ export function BookingWizard({
 
 /* ---------------------------------------------------------------- */
 
-function Progress({ step, onJump }: { step: number; onJump: (i: number) => void }) {
+function Progress({ step, flow, onJump }: { step: number; flow: number[]; onJump: (i: number) => void }) {
+  const pos = flow.indexOf(step);
   return (
     <nav aria-label="Etapas do agendamento">
       <p className="label text-stone sm:hidden">
-        Etapa {step + 1} de {STEPS.length}: <span className="text-ink">{STEPS[step]}</span>
+        Etapa {pos + 1} de {flow.length}: <span className="text-ink">{STEPS[step]}</span>
       </p>
-      <ol className="hidden grid-cols-6 gap-4 sm:grid">
-        {STEPS.map((label, i) => (
-          <li key={label}>
+      <ol className="hidden gap-4 sm:grid" style={{ gridTemplateColumns: `repeat(${flow.length}, minmax(0, 1fr))` }}>
+        {flow.map((i, n) => (
+          <li key={STEPS[i]}>
             <button
               type="button"
               onClick={() => onJump(i)}
@@ -749,8 +761,8 @@ function Progress({ step, onJump }: { step: number; onJump: (i: number) => void 
               className="w-full text-left disabled:cursor-default"
             >
               <span className={`block text-[0.6rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 ${i <= step ? "text-ink" : "text-stone/60"}`}>
-                <span className="block text-accent-deep">0{i + 1}</span>
-                {label}
+                <span className="block text-accent-deep">0{n + 1}</span>
+                {STEPS[i]}
               </span>
             </button>
           </li>
@@ -760,7 +772,7 @@ function Progress({ step, onJump }: { step: number; onJump: (i: number) => void 
         <motion.div
           className="absolute inset-y-0 left-0 bg-ink"
           initial={false}
-          animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+          animate={{ width: `${((pos + 1) / flow.length) * 100}%` }}
           transition={{ duration: 0.4, ease: EASE }}
         />
       </div>
