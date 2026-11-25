@@ -6,12 +6,12 @@
 --  número de clientes é criado aqui.
 -- =====================================================================
 
--- "Seu Nome" é um marcador: troque pelo seu nome em /admin/configuracoes.
+-- Nome exibido no site: Arthur (editável em /admin/configuracoes).
 -- Telefone e WhatsApp: (69) 9608-1567 (somente dígitos, com DDD).
 insert into public.business_settings (id, name, tagline, description, cancellation_policy, phone, whatsapp)
 values (
   1,
-  'Seu Nome',
+  'Arthur',
   'Corte masculino',
   'Cada detalhe importa. Meu propósito é proporcionar uma experiência única, unindo técnica, cuidado e sofisticação para valorizar a beleza e a personalidade de cada cliente.',
   'Cancelamentos e reagendamentos podem ser solicitados com até 24 horas de antecedência pelo WhatsApp. Atrasos superiores a 15 minutos podem exigir reagendamento.',
@@ -20,7 +20,10 @@ values (
 )
 on conflict (id) do update
   -- se as configurações já existirem, só preenche telefone/WhatsApp vazios
-  set phone    = coalesce(public.business_settings.phone, excluded.phone),
+  -- e troca o nome apenas se ainda for um dos marcadores antigos
+  set name     = case when public.business_settings.name in ('Seu Nome', 'Atelier Aurea')
+                      then excluded.name else public.business_settings.name end,
+      phone    = coalesce(public.business_settings.phone, excluded.phone),
       whatsapp = coalesce(public.business_settings.whatsapp, excluded.whatsapp);
 
 -- Horário de funcionamento do salão (professional_id NULL).
@@ -73,11 +76,11 @@ select v.image_url, v.alt, v.category, v.sort_order
 -- cadastrado em Configurações. Rode o seed de novo depois de criar serviços
 -- para vinculá-los (ou marque-os em /admin/profissionais).
 insert into public.professionals (slug, name, sort_order)
-select 'agenda-principal', 'Agenda principal', 1
+select 'arthur', 'Arthur', 1
  where not exists (select 1 from public.professionals);
 
 insert into public.professional_services (professional_id, service_id)
 select p.id, s.id
   from public.professionals p cross join public.services s
- where p.slug = 'agenda-principal' and s.is_active
+ where p.slug = 'arthur' and s.is_active
 on conflict do nothing;

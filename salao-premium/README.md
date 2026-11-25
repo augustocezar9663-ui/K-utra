@@ -4,7 +4,7 @@ Site pessoal premium + agendamento online + painel administrativo para um **prof
 
 **Stack:** Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Motion · Lucide · Supabase (Postgres, Auth, Storage) · Zod.
 
-> O nome exibido começa como **"Seu Nome"** (marcador): troque em *Painel → Configurações*. Preços, durações e horário de atendimento também são **valores iniciais editáveis**.
+> Site do **Arthur**. O nome exibido pode ser alterado em *Painel → Configurações*. Preços, durações e horário de atendimento também são **valores iniciais editáveis**.
 > Nenhum depoimento ou número de clientes é inventado: essas seções só exibem o que for cadastrado no painel.
 
 ---
